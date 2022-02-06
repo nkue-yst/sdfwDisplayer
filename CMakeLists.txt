@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
-project(2DGameEngine)
+project(SimpleDrawingFramework)
 
 
 ### Setup C++ Project ###
@@ -7,6 +7,9 @@ enable_language(CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 if(MSVC)
     if(CMAKE_CXX_FLAGS MATCHES "/w[0-4]")
@@ -19,12 +22,13 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 
-### Create Target "2DGameEngine" ###
+### Create Target "SimpleDrawingFramework" ###
 set(src
     source/test.cpp
 )
 
-add_executable(2DGameEngine ${src})
+add_executable(SimpleDrawingFramework ${src})
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT SimpleDrawingFramework)
 
 
 ### Setup thirdparty modules ###
@@ -33,12 +37,11 @@ include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2/include)
 if(WIN32)
     find_library(SDL2_LIB SDL2 ${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64)
     find_library(SDL2MAIN_LIB SDL2main ${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64)
-    target_link_libraries(2DGameEngine ${SDL2_LIB})
-    target_link_libraries(2DGameEngine ${SDL2MAIN_LIB})
-    target_link_libraries(2DGameEngine opengl32)
-    target_link_libraries(2DGameEngine version)
-    target_link_libraries(2DGameEngine winmm)
-    target_link_libraries(2DGameEngine imm32)
-    target_link_libraries(2DGameEngine setupapi)
-    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT 2DGameEngine)
+    target_link_libraries(SimpleDrawingFramework ${SDL2_LIB})
+    target_link_libraries(SimpleDrawingFramework ${SDL2MAIN_LIB})
+    target_link_libraries(SimpleDrawingFramework opengl32)
+    target_link_libraries(SimpleDrawingFramework version)
+    target_link_libraries(SimpleDrawingFramework winmm)
+    target_link_libraries(SimpleDrawingFramework imm32)
+    target_link_libraries(SimpleDrawingFramework setupapi)
 endif()
