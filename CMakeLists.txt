@@ -30,7 +30,9 @@ endif()
 
 ### Create Target "SDF_DrawingServer" ###
 set(DRAWING_SERVER_SRC
-    source/test.cpp
+    source/Main.cpp
+    source/Assertion.hpp
+    source/Assertion.cpp
 )
 
 add_executable(sdfw_DrawingServer ${DRAWING_SERVER_SRC})
@@ -38,13 +40,24 @@ set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT sdfw_DrawingServer)
 
 
 ### Setup thirdparty modules ###
-# SDL2 #
+# SDL2, SDL2_net #
 include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2/include)
+include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/include)
 if(WIN32)
     find_library(SDL2_LIB SDL2 ${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64)
     find_library(SDL2MAIN_LIB SDL2main ${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64)
+    find_library(SDL2_NET_LIB SDL2_net ${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/lib/win64)
+    add_custom_command(
+        TARGET sdfw_DrawingServer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/lib/win64/SDL2_net.dll" $<TARGET_FILE_DIR:sdfw_DrawingServer>
+    )
+    add_custom_command(
+        TARGET sdfw_DrawingServer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64/SDL2.dll" $<TARGET_FILE_DIR:sdfw_DrawingServer>
+    )
     target_link_libraries(sdfw_DrawingServer ${SDL2_LIB})
     target_link_libraries(sdfw_DrawingServer ${SDL2MAIN_LIB})
+    target_link_libraries(sdfw_DrawingServer ${SDL2_NET_LIB})
     target_link_libraries(sdfw_DrawingServer opengl32)
     target_link_libraries(sdfw_DrawingServer version)
     target_link_libraries(sdfw_DrawingServer winmm)
