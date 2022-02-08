@@ -3,24 +3,16 @@
  * @author  Y.Nakaue
  */
 
-#include "Assertion.hpp"
-
-#include <SDL.h>
-#include <SDL_net.h>
+#include "sdfwDisplayer.hpp"
+#include <Windows.h>
+#define PORT_NUM 62491
 
 int main(int argc, char** argv)
 {
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-    {
-        SDFW_Assertion::Abort("Failed to initialize SDL2");
-    }
+    sdfwDisplayer app;
+    app.init(PORT_NUM);
 
-    if (SDLNet_Init() != 0)
-    {
-        SDFW_Assertion::Abort("Failed to initialize SDL2_net");
-    }
+    app.run();
 
-    SDLNet_Quit();
-    SDL_Quit();
     return 0;
 }

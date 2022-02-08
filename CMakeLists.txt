@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 
 ### Setup Project ###
-project(sdfw_DrawingServer)
+project(sdfwDisplayer)
 
 
 ### Setup C++ ###
@@ -29,14 +29,16 @@ endif()
 
 
 ### Create Target "SDF_DrawingServer" ###
-set(DRAWING_SERVER_SRC
+set(SDFW_DISPLAYER_SRC
     source/Main.cpp
-    source/Assertion.hpp
-    source/Assertion.cpp
+    source/MessageReceiver.hpp
+    source/MessageReceiver.cpp
+    source/sdfwDisplayer.hpp
+    source/sdfwDisplayer.cpp
 )
 
-add_executable(sdfw_DrawingServer ${DRAWING_SERVER_SRC})
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT sdfw_DrawingServer)
+add_executable(sdfwDisplayer ${SDFW_DISPLAYER_SRC})
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT sdfwDisplayer)
 
 
 ### Setup thirdparty modules ###
@@ -48,19 +50,19 @@ if(WIN32)
     find_library(SDL2MAIN_LIB SDL2main ${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64)
     find_library(SDL2_NET_LIB SDL2_net ${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/lib/win64)
     add_custom_command(
-        TARGET sdfw_DrawingServer POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/lib/win64/SDL2_net.dll" $<TARGET_FILE_DIR:sdfw_DrawingServer>
+        TARGET sdfwDisplayer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64/SDL2.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
     )
     add_custom_command(
-        TARGET sdfw_DrawingServer POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64/SDL2.dll" $<TARGET_FILE_DIR:sdfw_DrawingServer>
+        TARGET sdfwDisplayer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/lib/win64/SDL2_net.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
     )
-    target_link_libraries(sdfw_DrawingServer ${SDL2_LIB})
-    target_link_libraries(sdfw_DrawingServer ${SDL2MAIN_LIB})
-    target_link_libraries(sdfw_DrawingServer ${SDL2_NET_LIB})
-    target_link_libraries(sdfw_DrawingServer opengl32)
-    target_link_libraries(sdfw_DrawingServer version)
-    target_link_libraries(sdfw_DrawingServer winmm)
-    target_link_libraries(sdfw_DrawingServer imm32)
-    target_link_libraries(sdfw_DrawingServer setupapi)
+    target_link_libraries(sdfwDisplayer ${SDL2_LIB})
+    target_link_libraries(sdfwDisplayer ${SDL2MAIN_LIB})
+    target_link_libraries(sdfwDisplayer ${SDL2_NET_LIB})
+    target_link_libraries(sdfwDisplayer opengl32)
+    target_link_libraries(sdfwDisplayer version)
+    target_link_libraries(sdfwDisplayer winmm)
+    target_link_libraries(sdfwDisplayer imm32)
+    target_link_libraries(sdfwDisplayer setupapi)
 endif()
