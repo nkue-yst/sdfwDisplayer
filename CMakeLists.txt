@@ -43,9 +43,9 @@ set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT sdfwDisplayer)
 
 ### Setup thirdparty modules ###
 # SDL2, SDL2_net #
-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2/include)
-include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/include)
 if(WIN32)
+    include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2/include)
+    include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/include)
     find_library(SDL2_LIB SDL2 ${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64)
     find_library(SDL2MAIN_LIB SDL2main ${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64)
     find_library(SDL2_NET_LIB SDL2_net ${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/lib/win64)
@@ -65,4 +65,15 @@ if(WIN32)
     target_link_libraries(sdfwDisplayer winmm)
     target_link_libraries(sdfwDisplayer imm32)
     target_link_libraries(sdfwDisplayer setupapi)
+
+elseif(APPLE)
+    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/thirdparty/sdl2-cmake-modules)
+
+    find_package(SDL2 REQUIRED)
+    include_directories(${SDL2_INCLUDE_DIR})
+    target_link_libraries(sdfwDisplayer SDL2::Main)
+
+    find_package(SDL2_net REQUIRED)
+    include_directories(${SDL2_net_INCLUDE_DIR})
+    target_link_libraries(sdfwDisplayer SDL2::Net)
 endif()

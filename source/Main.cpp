@@ -4,7 +4,7 @@
  */
 
 #include "sdfwDisplayer.hpp"
-#include <Windows.h>
+
 #define PORT_NUM 62491
 
 int main(int argc, char** argv)

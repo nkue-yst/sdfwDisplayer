@@ -3,7 +3,6 @@
  * @author  Y.Nakaue
  */
 
-#include "Assertion.hpp"
 #include "MessageReceiver.hpp"
 #include "sdfwDisplayer.hpp"
 

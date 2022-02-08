@@ -1,0 +1,3 @@
+[submodule "thirdparty/sdl2-cmake-modules"]
+	path = thirdparty/sdl2-cmake-modules
+	url = git@github.com:aminosbh/sdl2-cmake-modules.git
