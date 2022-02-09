@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 ### Setup Project ###
 project(sdfwDisplayer)
+project(SendMessageTest)
 
 
 ### Setup C++ ###
@@ -28,7 +29,7 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 
-### Create Target "SDF_DrawingServer" ###
+### Create Target "sdfwDisplayer" ###
 set(SDFW_DISPLAYER_SRC
     source/Main.cpp
     source/MessageReceiver.hpp
@@ -65,7 +66,6 @@ if(WIN32)
     target_link_libraries(sdfwDisplayer winmm)
     target_link_libraries(sdfwDisplayer imm32)
     target_link_libraries(sdfwDisplayer setupapi)
-
 elseif(APPLE)
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/thirdparty/sdl2-cmake-modules)
 
@@ -77,3 +77,11 @@ elseif(APPLE)
     include_directories(${SDL2_net_INCLUDE_DIR})
     target_link_libraries(sdfwDisplayer SDL2::Net)
 endif()
+
+
+### Create Target "SendMessageTest" ###
+set(SEND_MESSAGE_TEST_SRC
+    source/SendMessageTest/Main.cpp
+)
+
+add_executable(SendMessageTest ${SEND_MESSAGE_TEST_SRC})
