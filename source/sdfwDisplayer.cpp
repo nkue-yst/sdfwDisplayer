@@ -48,7 +48,8 @@ void sdfwDisplayer::init(uint16_t port)
 void sdfwDisplayer::run()
 {
     /* Start to wait for a connection from a client program */
-    this->message_receiver_->AcceptConnection();
+    this->message_receiver_->acceptConnection();
+    this->message_receiver_->waitReceivingData();
 }
 
 void sdfwDisplayer::OutputLog(std::string message)

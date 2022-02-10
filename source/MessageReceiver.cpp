@@ -7,6 +7,7 @@
 #include "sdfwDisplayer.hpp"
 
 #include <chrono>
+#include <iostream>
 #include <thread>
 
 sdfwMessageReceiver::sdfwMessageReceiver()
@@ -52,7 +53,7 @@ void sdfwMessageReceiver::closeSocket()
     }
 }
 
-void sdfwMessageReceiver::AcceptConnection()
+void sdfwMessageReceiver::acceptConnection()
 {
     /* Attempt to connect until TCP_Accept is complete */
     while (true)
@@ -65,4 +66,30 @@ void sdfwMessageReceiver::AcceptConnection()
         sdfwDisplayer::OutputLog("Connection not complete.");
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
+
+    sdfwDisplayer::OutputLog("Connection complete.");
+}
+
+void sdfwMessageReceiver::waitReceivingData()
+{
+    int32_t result;
+    uint16_t buff[10] = {};
+
+    while (true)
+    {
+        result = SDLNet_TCP_Recv(this->sock_, buff, 10);
+
+        if (result <= 0)
+        {
+            std::cout << result << std::endl;
+            sdfwDisplayer::OutputLog("Could not find data to receive.");
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    std::cout << buff << std::endl;
 }

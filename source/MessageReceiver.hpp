@@ -38,7 +38,12 @@ public:
     /**
      * @brief  Wait for TCP_Accept to complete
      */
-    void AcceptConnection();
+    void acceptConnection();
+
+    /**
+     * @brief  Waiting for data to be received
+     */
+    void waitReceivingData();
 
 private:
     /// Server IP address
