@@ -48,10 +48,10 @@ int main(int argc, char** argv)
 
     // Send test character
     int32_t len, result;
-    const char* message = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    std::string message = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
-    len = strlen(message) + 1;
-    result = SDLNet_TCP_Send(sock, message, len);
+    len = message.length() + 1;
+    result = SDLNet_TCP_Send(sock, message.c_str(), len);
     if (result < len)
     {
         std::cout << "Error: SDLNet_TCP_Send() - " << SDLNet_GetError() << std::endl;

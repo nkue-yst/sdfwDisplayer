@@ -73,11 +73,11 @@ void sdfwMessageReceiver::acceptConnection()
 void sdfwMessageReceiver::waitReceivingData()
 {
     int32_t result;
-    uint16_t buff[10] = {};
+    char buff[37];
 
     while (true)
     {
-        result = SDLNet_TCP_Recv(this->sock_, buff, 10);
+        result = SDLNet_TCP_Recv(this->accepted_sock_, buff, 37);
 
         if (result <= 0)
         {
