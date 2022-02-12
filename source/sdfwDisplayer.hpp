@@ -4,6 +4,8 @@
  */
 
 #pragma once
+#include <SDL.h>
+
 #include <memory>
 #include <string>
 
@@ -49,4 +51,10 @@ public:
 private:
     /// TCP receiver
     std::unique_ptr<class sdfwMessageReceiver> message_receiver_;
+
+    /// SDL Window
+    SDL_Window* window_;
+
+    /// Is waiting parameter
+    bool is_waiting_param_;
 };

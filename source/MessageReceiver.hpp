@@ -42,8 +42,9 @@ public:
 
     /**
      * @brief  Waiting for data to be received
+     * @return  Received data
      */
-    void waitReceivingData();
+    uint16_t waitReceivingData();
 
 private:
     /// Server IP address

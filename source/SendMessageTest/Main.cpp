@@ -47,18 +47,32 @@ int main(int argc, char** argv)
     }
 
     // Send test character
-    int32_t len, result;
-    std::string message = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    int32_t result;
+    uint16_t msg;
 
-    len = message.length() + 1;
-    result = SDLNet_TCP_Send(sock, message.c_str(), len);
-    if (result < len)
+    while (true)
     {
-        std::cout << "Error: SDLNet_TCP_Send() - " << SDLNet_GetError() << std::endl;
+        std::cout << "Command -> ";
+        std::scanf("%hx", &msg);
+
+        result = SDLNet_TCP_Send(sock, &msg, sizeof(msg));
+        if (result < sizeof(msg))
+        {
+            std::cout << "Error: SDLNet_TCP_Send() - " << SDLNet_GetError() << std::endl;
+        }
+
+        std::printf("Send command: %x\n", msg);
+
+        if (msg == 0x0000)
+        {
+            break;
+        }
     }
 
     // End-Process
     SDLNet_TCP_Close(sock);
     SDLNet_Quit();
     SDL_Quit();
+
+    return 0;
 }

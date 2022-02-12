@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.2)
 
 ### Setup Project ###
-project(sdfwDisplayer)
+project(sdfwDisplayer CXX)
 
 
 ### Setup C++ ###
 enable_language(CXX)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -31,22 +31,23 @@ endif()
 ### Create Target "sdfwDisplayer" ###
 set(SDFW_DISPLAYER_SRC
     source/Main.cpp
+    source/Command.hpp
     source/MessageReceiver.hpp
     source/MessageReceiver.cpp
     source/sdfwDisplayer.hpp
     source/sdfwDisplayer.cpp
 )
-
 add_executable(sdfwDisplayer ${SDFW_DISPLAYER_SRC})
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT sdfwDisplayer)
 
 
 ### Create Target "SendMessageTest" ###
 set(SEND_MESSAGE_TEST_SRC
     source/SendMessageTest/Main.cpp
 )
-
 add_executable(SendMessageTest ${SEND_MESSAGE_TEST_SRC})
+
+
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT sdfwDisplayer)
 
 
 ### Setup thirdparty modules ###

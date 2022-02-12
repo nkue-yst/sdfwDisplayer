@@ -70,26 +70,25 @@ void sdfwMessageReceiver::acceptConnection()
     sdfwDisplayer::OutputLog("Connection complete.");
 }
 
-void sdfwMessageReceiver::waitReceivingData()
+uint16_t sdfwMessageReceiver::waitReceivingData()
 {
     int32_t result;
-    char buff[37];
+    uint16_t buff;
 
     while (true)
     {
-        result = SDLNet_TCP_Recv(this->accepted_sock_, buff, 37);
+        result = SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(buff));
 
+        /***************************************
+         * If data reception fails,            *
+         * it will attempt to receive the data *
+         * after executing the sleep process.  *
+         ***************************************/
         if (result <= 0)
-        {
-            std::cout << result << std::endl;
-            sdfwDisplayer::OutputLog("Could not find data to receive.");
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         else
-        {
             break;
-        }
     }
 
-    std::cout << buff << std::endl;
+    return buff;
 }
