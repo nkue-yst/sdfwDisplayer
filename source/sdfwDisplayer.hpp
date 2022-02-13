@@ -48,12 +48,20 @@ public:
      */
     static void OutputLog(std::string message);
 
+    /**
+     * @brief  Execute opening window
+     */
+    void execOpenWindow();
+
 private:
     /// TCP receiver
     std::unique_ptr<class sdfwMessageReceiver> message_receiver_;
 
     /// SDL Window
     SDL_Window* window_;
+
+    /// SDL Renderer
+    SDL_Renderer* renderer_;
 
     /// Is waiting parameter
     bool is_waiting_param_;

@@ -6,6 +6,8 @@
 #pragma once
 #include <SDL_net.h>
 
+#include <vector>
+
 /**
 * @brief  Class of receiving message with TCP
 */
@@ -41,10 +43,16 @@ public:
     void acceptConnection();
 
     /**
-     * @brief  Waiting for data to be received
-     * @return  Received data
+     * @brief  Waiting for command to be received
+     * @return  Received command code
      */
-    uint16_t waitReceivingData();
+    uint16_t waitReceivingCommand();
+
+    /**
+     * @brief  Waiting for parameters to be received
+     * @return  Received parameters vector's pointer
+     */
+    std::vector<uint16_t> waitReceivingParams(uint16_t parameters_num);
 
 private:
     /// Server IP address

@@ -14,6 +14,7 @@
 sdfwDisplayer::sdfwDisplayer()
     : message_receiver_(nullptr)
     , window_(nullptr)
+    , renderer_(nullptr)
     , is_waiting_param_(false)
 {
     /* Initialize SDL2 */
@@ -32,6 +33,10 @@ sdfwDisplayer::sdfwDisplayer()
 sdfwDisplayer::~sdfwDisplayer()
 {
     this->OutputLog("The application terminated successfully.");
+
+    /* Destroy SDL component */
+    SDL_DestroyWindow(this->window_);
+    SDL_DestroyRenderer(this->renderer_);
 
     /* Quit SDL2 and SDL2_net */
     SDLNet_Quit();
@@ -61,12 +66,12 @@ void sdfwDisplayer::run()
      ***********************************/
     while (command_code != COMMAND_QUIT)
     {
-        command_code = this->message_receiver_->waitReceivingData();
+        command_code = this->message_receiver_->waitReceivingCommand();
 
         switch (command_code)
         {
         case COMMAND_OPEN_WINDOW:
-            std::cout << "Open window" << std::endl;
+            this->execOpenWindow();
             break;
 
         default:
@@ -87,4 +92,37 @@ void sdfwDisplayer::Abort(std::string message)
     this->message_receiver_->closeSocket();
 
     std::exit(1);
+}
+
+/* Execute opening window */
+void sdfwDisplayer::execOpenWindow()
+{
+    /* If the window exist, finish without doing anything */
+    if (this->window_ != NULL)
+    {
+        return;
+    }
+
+    /* Wait for parameters */
+    std::vector<uint16_t> params;
+    params = this->message_receiver_->waitReceivingParams(2);
+
+    /* Create new window */
+    this->window_ = SDL_CreateWindow("Window - 1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, params[0], params[1], SDL_WINDOW_BORDERLESS);
+    if (this->window_ == NULL)
+    {
+        sdfwDisplayer::Abort("Failed to open new window");
+    }
+
+    /* Create new renderer */
+    this->renderer_ = SDL_CreateRenderer(this->window_, -1, SDL_RENDERER_ACCELERATED);
+    if (this->renderer_ == NULL)
+    {
+        sdfwDisplayer::Abort("Failed to create renderer");
+    }
+
+    /* Clear renderer */
+    SDL_SetRenderDrawColor(this->renderer_, 0, 255, 0, 255);
+    SDL_RenderClear(this->renderer_);
+    SDL_RenderPresent(this->renderer_);
 }
