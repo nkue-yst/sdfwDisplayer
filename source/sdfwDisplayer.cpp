@@ -66,16 +66,21 @@ void sdfwDisplayer::run()
      ***********************************/
     while (command_code != COMMAND_QUIT)
     {
+        // Read command code or parameters
         command_code = this->message_receiver_->waitReceivingCommand();
 
-        switch (command_code)
+        /* Execute command if the most upper bit is '1' */
+        if ((command_code >> 15) & 1)
         {
-        case COMMAND_OPEN_WINDOW:
-            this->execOpenWindow();
-            break;
+            switch (command_code)
+            {
+            case COMMAND_OPEN_WINDOW:
+                execOpenWindow();
+                break;
 
-        default:
-            break;
+            default:
+                break;
+            }
         }
     }
 }
@@ -97,6 +102,8 @@ void sdfwDisplayer::Abort(std::string message)
 /* Execute opening window */
 void sdfwDisplayer::execOpenWindow()
 {
+    std::cout << "execOpenWindow()" << std::endl;
+
     /* If the window exist, finish without doing anything */
     if (this->window_ != NULL)
     {

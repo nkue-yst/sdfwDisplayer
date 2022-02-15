@@ -5,6 +5,7 @@
 
 #pragma once
 #include <SDL.h>
+#include <SDL_thread.h>
 
 #include <memory>
 #include <string>

@@ -4,6 +4,7 @@
  */
 
 #include "MessageReceiver.hpp"
+#include "Command.hpp"
 #include "sdfwDisplayer.hpp"
 
 #include <chrono>
@@ -72,12 +73,30 @@ void sdfwMessageReceiver::acceptConnection()
 
 uint16_t sdfwMessageReceiver::waitReceivingCommand()
 {
-    int32_t result;
-    uint16_t buff;
+    int32_t result = 0;
+    uint16_t command = COMMAND_INIT;
+    uint8_t buff;
 
     while (true)
     {
-        result = SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(buff));
+        result += SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(uint8_t));
+
+        auto printb = [](uint16_t x)
+        {
+            putchar('0');
+            putchar('b');
+
+            uint32_t mask = (int)1 << (sizeof(x) * CHAR_BIT - 1);
+            do
+            {
+                putchar(mask & x ? '1' : '0');
+            } while (mask >>= 1);
+
+            putchar('\n');
+        };
+
+        if (buff == COMMAND_QUIT)
+            return COMMAND_QUIT;
 
         /***************************************
          * If data reception fails,            *
@@ -89,13 +108,21 @@ uint16_t sdfwMessageReceiver::waitReceivingCommand()
             sdfwDisplayer::OutputLog("Waiting command");
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        else
+        else if (result == 1)
         {
+            command = buff;
+            command <<= 8;
+            printb(command);
+        }
+        else if (result == 2)
+        {
+            command += buff;
+            printb(command);
             break;
         }
     }
 
-    return buff;
+    return command;
 }
 
 /* Waiting for parameters to be received */
@@ -122,7 +149,7 @@ std::vector<uint16_t> sdfwMessageReceiver::waitReceivingParams(uint16_t paramete
         else
         {
             return_value.push_back(buff);
-            
+
             if (return_value.size() == parameters_num)
                 break;
         }
