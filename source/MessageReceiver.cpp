@@ -71,29 +71,14 @@ void sdfwMessageReceiver::acceptConnection()
     sdfwDisplayer::OutputLog("Connection complete.");
 }
 
-uint16_t sdfwMessageReceiver::waitReceivingCommand()
+uint32_t sdfwMessageReceiver::waitReceivingMessage()
 {
     int32_t result = 0;
-    uint16_t command = COMMAND_INIT;
-    uint8_t buff;
+    uint32_t buff = COMMAND_INIT;
 
     while (true)
     {
-        result += SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(uint8_t));
-
-        auto printb = [](uint16_t x)
-        {
-            putchar('0');
-            putchar('b');
-
-            uint32_t mask = (int)1 << (sizeof(x) * CHAR_BIT - 1);
-            do
-            {
-                putchar(mask & x ? '1' : '0');
-            } while (mask >>= 1);
-
-            putchar('\n');
-        };
+        result = SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(uint32_t));
 
         if (buff == COMMAND_QUIT)
             return COMMAND_QUIT;
@@ -108,52 +93,10 @@ uint16_t sdfwMessageReceiver::waitReceivingCommand()
             sdfwDisplayer::OutputLog("Waiting command");
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        else if (result == 1)
-        {
-            command = buff;
-            command <<= 8;
-            printb(command);
-        }
-        else if (result == 2)
-        {
-            command += buff;
-            printb(command);
+
+        if (result >= sizeof(uint32_t))
             break;
-        }
     }
 
-    return command;
-}
-
-/* Waiting for parameters to be received */
-std::vector<uint16_t> sdfwMessageReceiver::waitReceivingParams(uint16_t parameters_num)
-{
-    int32_t result;
-    uint16_t buff;
-    std::vector<uint16_t> return_value;
-
-    while (true)
-    {
-        result = SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(buff));
-
-        /***************************************
-         * If data reception fails,            *
-         * it will attempt to receive the data *
-         * after executing the sleep process.  *
-         ***************************************/
-        if (result <= 0)
-        {
-            sdfwDisplayer::OutputLog("Waiting parameters");
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-        else
-        {
-            return_value.push_back(buff);
-
-            if (return_value.size() == parameters_num)
-                break;
-        }
-    }
-
-    return return_value;
+    return buff;
 }

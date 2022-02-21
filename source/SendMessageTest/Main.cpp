@@ -48,36 +48,20 @@ int main(int argc, char** argv)
 
     // Send test character
     int32_t result;
-    uint8_t msg;
+    uint32_t msg;
 
     while (true)
     {
         std::cout << "Command -> ";
-        std::scanf("%u", &msg);
+        std::scanf("%x", &msg);
 
-        result = SDLNet_TCP_Send(sock, &msg, 1);
+        result = SDLNet_TCP_Send(sock, &msg, sizeof(msg));
         if (result < sizeof(msg))
         {
             std::cout << "Error: SDLNet_TCP_Send() - " << SDLNet_GetError() << std::endl;
         }
 
-        auto printb = [](uint32_t x)
-        {
-            putchar('0');
-            putchar('b');
-
-            uint32_t mask = (int)1 << (sizeof(x) * CHAR_BIT - 1);
-            do
-            {
-                putchar(mask & x ? '1' : '0');
-            } while (mask >>= 1);
-
-            putchar('\n');
-        };
-
-        printb(msg);
-
-        if (msg == 0b00000000)
+        if (msg == 0xFFFFFFFF)
         {
             break;
         }

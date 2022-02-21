@@ -15,7 +15,6 @@ sdfwDisplayer::sdfwDisplayer()
     : message_receiver_(nullptr)
     , window_(nullptr)
     , renderer_(nullptr)
-    , is_waiting_param_(false)
 {
     /* Initialize SDL2 */
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -58,29 +57,40 @@ void sdfwDisplayer::run()
     /* Start to wait for a connection from a client program */
     this->message_receiver_->acceptConnection();
 
-    uint16_t command_code = COMMAND_INIT;
+    uint32_t msg = COMMAND_INIT;
 
     /***********************************
      * Receive and execute command     *
      * until the QUIT command is read. *
      ***********************************/
-    while (command_code != COMMAND_QUIT)
+    while (msg != COMMAND_QUIT)
     {
         // Read command code or parameters
-        command_code = this->message_receiver_->waitReceivingCommand();
+        msg = this->message_receiver_->waitReceivingMessage();
 
-        /* Execute command if the most upper bit is '1' */
-        if ((command_code >> 15) & 1)
+        if (msg == COMMAND)
         {
-            switch (command_code)
+            if (!func_.empty())
             {
-            case COMMAND_OPEN_WINDOW:
-                execOpenWindow();
-                break;
+                switch (func_[0])
+                {
+                case COMMAND_OPEN_WINDOW:
+                    this->execOpenWindow();
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+                }
             }
+            func_.clear();
+            params_.clear();
+
+            msg = this->message_receiver_->waitReceivingMessage();
+            this->func_.push_back(msg);
+        }
+        else if (msg == PARAMETER)
+        {
+            this->params_.push_back(this->message_receiver_->waitReceivingMessage());
         }
     }
 }
@@ -102,24 +112,20 @@ void sdfwDisplayer::Abort(std::string message)
 /* Execute opening window */
 void sdfwDisplayer::execOpenWindow()
 {
-    std::cout << "execOpenWindow()" << std::endl;
-
     /* If the window exist, finish without doing anything */
     if (this->window_ != NULL)
     {
         return;
     }
 
-    /* Wait for parameters */
-    std::vector<uint16_t> params;
-    params = this->message_receiver_->waitReceivingParams(2);
-
     /* Create new window */
-    this->window_ = SDL_CreateWindow("Window - 1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, params[0], params[1], SDL_WINDOW_BORDERLESS);
+    this->window_ = SDL_CreateWindow("Window - 1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->params_[0], this->params_[1], SDL_WINDOW_BORDERLESS);
     if (this->window_ == NULL)
     {
         sdfwDisplayer::Abort("Failed to open new window");
     }
+
+    std::cout << this->params_[0] << ", " << this->params_[1] << std::endl;
 
     /* Create new renderer */
     this->renderer_ = SDL_CreateRenderer(this->window_, -1, SDL_RENDERER_ACCELERATED);

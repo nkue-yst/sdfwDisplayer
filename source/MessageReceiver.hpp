@@ -43,16 +43,10 @@ public:
     void acceptConnection();
 
     /**
-     * @brief  Waiting for command to be received
-     * @return  Received command code
+     * @brief  Waiting for message to be received
+     * @return  Received message
      */
-    uint16_t waitReceivingCommand();
-
-    /**
-     * @brief  Waiting for parameters to be received
-     * @return  Received parameters vector's pointer
-     */
-    std::vector<uint16_t> waitReceivingParams(uint16_t parameters_num);
+    uint32_t waitReceivingMessage();
 
 private:
     /// Server IP address

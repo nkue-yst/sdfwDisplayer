@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
  /**
   * @brief  Main application class
@@ -64,6 +65,9 @@ private:
     /// SDL Renderer
     SDL_Renderer* renderer_;
 
-    /// Is waiting parameter
-    bool is_waiting_param_;
+    /// Function queue
+    std::vector<uint32_t> func_;
+
+    /// Parameters queue
+    std::vector<uint32_t> params_;
 };
