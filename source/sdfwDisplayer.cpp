@@ -70,27 +70,24 @@ void sdfwDisplayer::run()
 
         if (msg == COMMAND)
         {
-            if (!func_.empty())
-            {
-                switch (func_[0])
-                {
-                case COMMAND_OPEN_WINDOW:
-                    this->execOpenWindow();
-                    break;
-
-                default:
-                    break;
-                }
-            }
-            func_.clear();
-            params_.clear();
-
             msg = this->message_receiver_->waitReceivingMessage();
+            this->func_.clear();
             this->func_.push_back(msg);
         }
         else if (msg == PARAMETER)
         {
-            this->params_.push_back(this->message_receiver_->waitReceivingMessage());
+            msg = this->message_receiver_->waitReceivingMessage();
+            this->params_.push_back(msg);
+        }
+
+        /* Execute command if there are enough parameters */
+        if (!this->func_.empty())
+        {
+            if (this->executeCommand(this->func_[0]))
+            {
+                this->func_.clear();
+                this->params_.clear();
+            }
         }
     }
 }
@@ -109,13 +106,28 @@ void sdfwDisplayer::Abort(std::string message)
     std::exit(1);
 }
 
-/* Execute opening window */
-void sdfwDisplayer::execOpenWindow()
+/* Select and execute function */
+bool sdfwDisplayer::executeCommand(uint32_t command_code)
 {
-    /* If the window exist, finish without doing anything */
-    if (this->window_ != NULL)
+    switch (command_code)
     {
-        return;
+    case COMMAND_OPEN_WINDOW:
+        return this->execOpenWindow();
+        
+    default:
+        break;
+    }
+
+    return false;
+}
+
+/* Execute opening window */
+bool sdfwDisplayer::execOpenWindow()
+{
+    /* If the parameters are missing, it end up doing nothing */
+    if (this->params_.size() < 2)
+    {
+        return false;
     }
 
     /* Create new window */
@@ -124,8 +136,6 @@ void sdfwDisplayer::execOpenWindow()
     {
         sdfwDisplayer::Abort("Failed to open new window");
     }
-
-    std::cout << this->params_[0] << ", " << this->params_[1] << std::endl;
 
     /* Create new renderer */
     this->renderer_ = SDL_CreateRenderer(this->window_, -1, SDL_RENDERER_ACCELERATED);
@@ -138,4 +148,6 @@ void sdfwDisplayer::execOpenWindow()
     SDL_SetRenderDrawColor(this->renderer_, 0, 255, 0, 255);
     SDL_RenderClear(this->renderer_);
     SDL_RenderPresent(this->renderer_);
+
+    return true;
 }

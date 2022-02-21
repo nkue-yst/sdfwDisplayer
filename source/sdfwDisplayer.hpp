@@ -51,9 +51,14 @@ public:
     static void OutputLog(std::string message);
 
     /**
+     * @brief  Select and execute function
+     */
+    bool executeCommand(uint32_t command_code);
+
+    /**
      * @brief  Execute opening window
      */
-    void execOpenWindow();
+    bool execOpenWindow();
 
 private:
     /// TCP receiver
