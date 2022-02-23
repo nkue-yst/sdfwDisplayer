@@ -53,14 +53,22 @@ public:
     /**
      * @brief  Select and execute function
      */
-    bool executeCommand(uint32_t command_code);
+    void executeCommand(std::string message);
+
+private:
+    /**
+     * @brief  Parse a string
+     * @param  str  Target string
+     * @param  delimiter  Character used to delimit string
+     * @return  Split word list
+     */
+    std::vector<std::string> parseMessage(const std::string& str, const char delimiter = '/');
 
     /**
      * @brief  Execute opening window
      */
-    bool execOpenWindow();
+    void execOpenWindow(uint32_t width, uint32_t height);
 
-private:
     /// TCP receiver
     std::unique_ptr<class sdfwMessageReceiver> message_receiver_;
 
@@ -70,9 +78,6 @@ private:
     /// SDL Renderer
     SDL_Renderer* renderer_;
 
-    /// Function queue
-    std::vector<uint32_t> func_;
-
-    /// Parameters queue
-    std::vector<uint32_t> params_;
+    /// Quit flag
+    bool quit_flag_;
 };

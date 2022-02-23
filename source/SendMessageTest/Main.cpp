@@ -48,23 +48,22 @@ int main(int argc, char** argv)
 
     // Send test character
     int32_t result;
-    uint32_t msg;
 
     while (true)
     {
         std::cout << "Command -> ";
-        std::scanf("%x", &msg);
+        char msg[1024];
+        std::cin >> msg;
+        int32_t length = static_cast<int32_t>(strlen(msg) + 1);
 
-        result = SDLNet_TCP_Send(sock, &msg, sizeof(msg));
-        if (result < sizeof(msg))
+        result = SDLNet_TCP_Send(sock, &msg, length);
+        if (result < length)
         {
             std::cout << "Error: SDLNet_TCP_Send() - " << SDLNet_GetError() << std::endl;
         }
 
-        if (msg == 0xFFFFFFFF)
-        {
+        if (strstr(msg, "quit") != NULL)
             break;
-        }
     }
 
     // End-Process

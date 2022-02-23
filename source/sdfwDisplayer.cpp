@@ -3,9 +3,9 @@
  * @author  Y.Nakaue
  */
 
+#include "sdfwDisplayer.hpp"
 #include "Command.hpp"
 #include "MessageReceiver.hpp"
-#include "sdfwDisplayer.hpp"
 
 #include <SDL_net.h>
 
@@ -15,6 +15,7 @@ sdfwDisplayer::sdfwDisplayer()
     : message_receiver_(nullptr)
     , window_(nullptr)
     , renderer_(nullptr)
+    , quit_flag_(false)
 {
     /* Initialize SDL2 */
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -57,38 +58,9 @@ void sdfwDisplayer::run()
     /* Start to wait for a connection from a client program */
     this->message_receiver_->acceptConnection();
 
-    uint32_t msg = COMMAND_INIT;
-
-    /***********************************
-     * Receive and execute command     *
-     * until the QUIT command is read. *
-     ***********************************/
-    while (msg != COMMAND_QUIT)
+    while (!this->quit_flag_)
     {
-        // Read command code or parameters
-        msg = this->message_receiver_->waitReceivingMessage();
-
-        if (msg == COMMAND)
-        {
-            msg = this->message_receiver_->waitReceivingMessage();
-            this->func_.clear();
-            this->func_.push_back(msg);
-        }
-        else if (msg == PARAMETER)
-        {
-            msg = this->message_receiver_->waitReceivingMessage();
-            this->params_.push_back(msg);
-        }
-
-        /* Execute command if there are enough parameters */
-        if (!this->func_.empty())
-        {
-            if (this->executeCommand(this->func_[0]))
-            {
-                this->func_.clear();
-                this->params_.clear();
-            }
-        }
+        this->executeCommand(this->message_receiver_->waitReceivingMessage());
     }
 }
 
@@ -107,31 +79,53 @@ void sdfwDisplayer::Abort(std::string message)
 }
 
 /* Select and execute function */
-bool sdfwDisplayer::executeCommand(uint32_t command_code)
+void sdfwDisplayer::executeCommand(std::string message)
 {
-    switch (command_code)
+    std::vector<std::string> split_message = this->parseMessage(message);
+    Command command(split_message);
+    std::cout << command;
+
+    if (command.isEqualFunc("quit"))
     {
-    case COMMAND_OPEN_WINDOW:
-        return this->execOpenWindow();
-        
-    default:
-        break;
+        this->Abort("Successfully quit");
+    }
+}
+
+/* Parse a string */
+std::vector<std::string> sdfwDisplayer::parseMessage(const std::string& str, const char delimiter)
+{
+    std::vector<std::string> words;
+    std::string word;
+
+    for (int8_t c : str)
+    {
+        if (c == delimiter)
+        {
+            if (!word.empty())
+            {
+                words.push_back(word);
+            }
+            word.clear();
+        }
+        else
+        {
+            word += c;
+        }
     }
 
-    return false;
+    if (!word.empty())
+    {
+        words.push_back(word);
+    }
+
+    return words;
 }
 
 /* Execute opening window */
-bool sdfwDisplayer::execOpenWindow()
+void sdfwDisplayer::execOpenWindow(uint32_t width, uint32_t height)
 {
-    /* If the parameters are missing, it end up doing nothing */
-    if (this->params_.size() < 2)
-    {
-        return false;
-    }
-
     /* Create new window */
-    this->window_ = SDL_CreateWindow("Window - 1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->params_[0], this->params_[1], SDL_WINDOW_BORDERLESS);
+    this->window_ = SDL_CreateWindow("Window - 1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_BORDERLESS);
     if (this->window_ == NULL)
     {
         sdfwDisplayer::Abort("Failed to open new window");
@@ -148,6 +142,4 @@ bool sdfwDisplayer::execOpenWindow()
     SDL_SetRenderDrawColor(this->renderer_, 0, 255, 0, 255);
     SDL_RenderClear(this->renderer_);
     SDL_RenderPresent(this->renderer_);
-
-    return true;
 }

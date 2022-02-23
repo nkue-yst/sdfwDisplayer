@@ -6,6 +6,7 @@
 #pragma once
 #include <SDL_net.h>
 
+#include <string>
 #include <vector>
 
 /**
@@ -46,7 +47,7 @@ public:
      * @brief  Waiting for message to be received
      * @return  Received message
      */
-    uint32_t waitReceivingMessage();
+    std::string waitReceivingMessage();
 
 private:
     /// Server IP address

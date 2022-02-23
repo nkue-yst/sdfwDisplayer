@@ -71,17 +71,15 @@ void sdfwMessageReceiver::acceptConnection()
     sdfwDisplayer::OutputLog("Connection complete.");
 }
 
-uint32_t sdfwMessageReceiver::waitReceivingMessage()
+std::string sdfwMessageReceiver::waitReceivingMessage()
 {
     int32_t result = 0;
-    uint32_t buff = COMMAND_INIT;
+    std::string str;
+    int8_t buff;
 
     while (true)
     {
-        result = SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(uint32_t));
-
-        if (buff == COMMAND_QUIT)
-            return COMMAND_QUIT;
+        result = SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(int8_t));
 
         /***************************************
          * If data reception fails,            *
@@ -94,9 +92,11 @@ uint32_t sdfwMessageReceiver::waitReceivingMessage()
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
-        if (result >= sizeof(uint32_t))
+        if (buff == '\0')
             break;
+        else
+            str += buff;
     }
 
-    return buff;
+    return str;
 }
