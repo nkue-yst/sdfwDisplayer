@@ -4,6 +4,9 @@
  */
 
 #pragma once
+
+#include "Command.hpp"
+
 #include <SDL_net.h>
 
 #include <string>
@@ -14,42 +17,80 @@
 */
 class sdfwMessageReceiver
 {
-public:
+protected:
     /**
      * @brief  Initialize variables
      */
-    sdfwMessageReceiver();
+    sdfwMessageReceiver(uint16_t port = 62491);
 
     /**
      * @brief  Close TCP socket if opend
      */
     ~sdfwMessageReceiver();
 
+public:
+    /**
+     * @brief  Create instance
+     */
+    static sdfwMessageReceiver* create()
+    {
+        return new sdfwMessageReceiver();
+    }
+
+    /**
+     * @brief  Get instance
+     * @return  Instance of singleton
+     */
+    static sdfwMessageReceiver* get()
+    {
+        if (pInstance_ == nullptr)
+        {
+            pInstance_ = create();
+        }
+
+        return pInstance_;
+    }
+
+    /**
+     * @brief  Destroy instance
+     */
+    static void destroy()
+    {
+        delete pInstance_;
+        pInstance_ = nullptr;
+    }
+
+    /**
+     * @brief  Waiting for message to be received
+     * @return  Received message
+     */
+    std::string receiveMessage();
+
     /**
      * @brief  Open TCP socket
      * @param  port  Port num using TCP connection
      * @return  Error code (0: Success, 1: Error)
      */
-    int32_t openSocket(uint16_t port);
-
-    /**
-     * @brief  Close TCP socket
-     * @param  sock  Socket to close
-     */
-    void closeSocket();
+    int32_t openSocket(uint16_t port = 62491);
 
     /**
      * @brief  Wait for TCP_Accept to complete
      */
     void acceptConnection();
 
-    /**
-     * @brief  Waiting for message to be received
-     * @return  Received message
-     */
-    std::string waitReceivingMessage();
-
 private:
+    /**
+     * @brief  Close TCP socket
+     * @param  sock  Socket to close
+     */
+    void closeSocket();
+    
+    /// Instance for singleton
+    inline static sdfwMessageReceiver* pInstance_ = nullptr;
+
+    /// Buffer for receiving message
+    std::vector<struct Command> msg_buff_;
+
     /// Server IP address
     IPaddress ip_addr_;
 

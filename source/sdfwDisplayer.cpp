@@ -5,6 +5,7 @@
 
 #include "sdfwDisplayer.hpp"
 #include "Command.hpp"
+#include "Main.hpp"
 #include "MessageReceiver.hpp"
 
 #include <SDL_net.h>
@@ -12,27 +13,26 @@
 #include <iostream>
 
 sdfwDisplayer::sdfwDisplayer()
-    : message_receiver_(nullptr)
-    , window_(nullptr)
+    : window_(nullptr)
     , renderer_(nullptr)
     , quit_flag_(false)
 {
     /* Initialize SDL2 */
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
-        this->Abort("Failed to initialize SDL2");
+        sdfw::abort();
     }
 
     /* Initialize SDL2_net */
     if (SDLNet_Init() != 0)
     {
-        this->Abort("Failed to initialize SDL2_net");
+        abort();
     }
 }
 
 sdfwDisplayer::~sdfwDisplayer()
 {
-    this->OutputLog("The application terminated successfully.");
+    sdfw::outputLog("The application terminated successfully.");
 
     /* Destroy SDL component */
     SDL_DestroyWindow(this->window_);
@@ -43,39 +43,12 @@ sdfwDisplayer::~sdfwDisplayer()
     SDL_Quit();
 }
 
-void sdfwDisplayer::init(uint16_t port)
-{
-    this->message_receiver_ = std::unique_ptr<sdfwMessageReceiver>(new sdfwMessageReceiver());
-
-    if (this->message_receiver_->openSocket(port) != 0)
-    {
-        this->Abort("Failed to open socket");
-    }
-}
-
 void sdfwDisplayer::run()
 {
-    /* Start to wait for a connection from a client program */
-    this->message_receiver_->acceptConnection();
-
     while (!this->quit_flag_)
     {
-        this->executeCommand(this->message_receiver_->waitReceivingMessage());
+        sdfw::outputLog("sdfwDisplayer::run()");
     }
-}
-
-void sdfwDisplayer::OutputLog(std::string message)
-{
-    std::cout << "sdfw_Log: " << message << std::endl;
-}
-
-void sdfwDisplayer::Abort(std::string message)
-{
-    std::cout << "sdfw_Log (Abort): " << message << std::endl;
-
-    this->message_receiver_->closeSocket();
-
-    std::exit(1);
 }
 
 /* Select and execute function */
@@ -89,7 +62,7 @@ void sdfwDisplayer::executeCommand(std::string message)
     {
         int temp;
         std::cin >> temp;
-        this->Abort("Successfully quit");
+        sdfw::abort();
 
     }
 }
@@ -131,14 +104,14 @@ void sdfwDisplayer::execOpenWindow(uint32_t width, uint32_t height)
     this->window_ = SDL_CreateWindow("Window - 1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_BORDERLESS);
     if (this->window_ == NULL)
     {
-        sdfwDisplayer::Abort("Failed to open new window");
+        sdfw::abort();
     }
 
     /* Create new renderer */
     this->renderer_ = SDL_CreateRenderer(this->window_, -1, SDL_RENDERER_ACCELERATED);
     if (this->renderer_ == NULL)
     {
-        sdfwDisplayer::Abort("Failed to create renderer");
+        sdfw::abort();
     }
 
     /* Clear renderer */

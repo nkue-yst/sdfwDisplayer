@@ -30,6 +30,7 @@ endif()
 
 ### Create Target "sdfwDisplayer" ###
 set(SDFW_DISPLAYER_SRC
+    source/Main.hpp
     source/Main.cpp
     source/Command.hpp
     source/MessageReceiver.hpp

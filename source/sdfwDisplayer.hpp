@@ -16,7 +16,7 @@
   */
 class sdfwDisplayer
 {
-public:
+protected:
     /**
      * @brief  Initialize SDL2 and SDL2_net
      */
@@ -27,28 +27,42 @@ public:
      */
     ~sdfwDisplayer();
 
+public:
     /**
-     * @brief  Initialize sdfw Displayer app
-     * @param  port  Port num using TCP connection
+     * @brief  Create instance
      */
-    void init(uint16_t port);
+    static sdfwDisplayer* create()
+    {
+        return new sdfwDisplayer();
+    }
+
+    /**
+     * @brief  Get instance
+     * @return  Instance of singleton
+     */
+    static sdfwDisplayer* get()
+    {
+        if (pInstance_ == nullptr)
+        {
+            pInstance_ = create();
+        }
+
+        return pInstance_;
+    }
+
+    /**
+     * @brief  Destroy instance
+     */
+    static void destroy()
+    {
+        delete pInstance_;
+        pInstance_ = nullptr;
+    }
 
     /**
      * @brief  Run displayer
      */
     void run();
-
-    /**
-     * @brief  Output error message and quit system
-     * @param  message  Output message
-     */
-    void Abort(std::string message);
-
-    /**
-     * @brief  Output log message
-     * @param  message  Output message
-     */
-    static void OutputLog(std::string message);
 
     /**
      * @brief  Select and execute function
@@ -69,8 +83,8 @@ private:
      */
     void execOpenWindow(uint32_t width, uint32_t height);
 
-    /// TCP receiver
-    std::unique_ptr<class sdfwMessageReceiver> message_receiver_;
+    /// Instance for singleton
+    inline static sdfwDisplayer* pInstance_ = nullptr;
 
     /// SDL Window
     SDL_Window* window_;
@@ -80,4 +94,5 @@ private:
 
     /// Quit flag
     bool quit_flag_;
+
 };

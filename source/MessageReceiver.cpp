@@ -6,13 +6,14 @@
 #include "MessageReceiver.hpp"
 #include "Command.hpp"
 #include "sdfwDisplayer.hpp"
+#include "Main.hpp"
 
 #include <chrono>
 #include <iostream>
 #include <thread>
 
-sdfwMessageReceiver::sdfwMessageReceiver()
-    : port_(0)
+sdfwMessageReceiver::sdfwMessageReceiver(uint16_t port)
+    : port_(port)
     , is_opend_(false)
 {
     this->ip_addr_ = IPaddress();
@@ -25,6 +26,29 @@ sdfwMessageReceiver::~sdfwMessageReceiver()
     this->closeSocket();
 }
 
+std::string sdfwMessageReceiver::receiveMessage()
+{
+    int32_t result = 0;
+    std::string str;
+    char buff;
+
+    while (true)
+        sdfw::outputLog("sdfwMessagereceiver::receiveMessage()");
+/*
+    while (true)
+    {
+        result = SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(char));
+
+        if (buff == '\0')
+            break;
+        else
+            str += buff;
+    }
+*/
+
+    return str;
+}
+
 int32_t sdfwMessageReceiver::openSocket(uint16_t port)
 {
     /* Create info of server ip */
@@ -34,12 +58,13 @@ int32_t sdfwMessageReceiver::openSocket(uint16_t port)
     }
     this->port_ = port;
 
-    /* Open TCP socket */
-    this->sock_ = SDLNet_TCP_Open(&this->ip_addr_);
-    if (!this->sock_)
+    /* Try TCP socket open until success */
+    while (!this->sock_)
     {
-        return 1;
+        this->sock_ = SDLNet_TCP_Open(&this->ip_addr_);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
+
     this->is_opend_ = true;
 
     return 0;
@@ -61,42 +86,13 @@ void sdfwMessageReceiver::acceptConnection()
     {
         this->accepted_sock_ = SDLNet_TCP_Accept(this->sock_);
 
+        // If apccepted_sock_ is not NULL, successfully connected.
         if (this->accepted_sock_)
             break;
 
-        sdfwDisplayer::OutputLog("Connection not complete.");
+        sdfw::outputLog("Connection not complete.");
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
-    sdfwDisplayer::OutputLog("Connection complete.");
-}
-
-std::string sdfwMessageReceiver::waitReceivingMessage()
-{
-    int32_t result = 0;
-    std::string str;
-    char buff;
-
-    while (true)
-    {
-        result = SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(char));
-
-        /***************************************
-         * If data reception fails,            *
-         * it will attempt to receive the data *
-         * after executing the sleep process.  *
-         ***************************************/
-        if (result <= 0)
-        {
-            sdfwDisplayer::OutputLog("Waiting command");
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-
-        if (buff == '\0')
-            break;
-        else
-            str += buff;
-    }
-
-    return str;
+    sdfw::outputLog("Connection complete.");
 }
