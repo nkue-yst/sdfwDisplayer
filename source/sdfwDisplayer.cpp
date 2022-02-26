@@ -83,11 +83,14 @@ void sdfwDisplayer::executeCommand(std::string message)
 {
     std::vector<std::string> split_message = this->parseMessage(message);
     Command command(split_message);
-    std::cout << command;
+    std::cout << command << std::endl;
 
     if (command.isEqualFunc("quit"))
     {
+        int temp;
+        std::cin >> temp;
         this->Abort("Successfully quit");
+
     }
 }
 

@@ -75,11 +75,11 @@ std::string sdfwMessageReceiver::waitReceivingMessage()
 {
     int32_t result = 0;
     std::string str;
-    int8_t buff;
+    char buff;
 
     while (true)
     {
-        result = SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(int8_t));
+        result = SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(char));
 
         /***************************************
          * If data reception fails,            *

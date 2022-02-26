@@ -45,7 +45,6 @@ struct Command
             stream << "Arg[" << i << "]: " << arg << std::endl;
             i++;
         }
-        stream << std::endl;
 
         // Return received stream
         return stream;
