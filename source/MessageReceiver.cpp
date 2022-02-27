@@ -26,27 +26,67 @@ sdfwMessageReceiver::~sdfwMessageReceiver()
     this->closeSocket();
 }
 
-std::string sdfwMessageReceiver::receiveMessage()
+void sdfwMessageReceiver::receiveMessage()
 {
-    int32_t result = 0;
-    std::string str;
     char buff;
+    std::string str;
+    struct Command command;
 
-    while (true)
-        sdfw::outputLog("sdfwMessagereceiver::receiveMessage()");
-/*
+    sdfw::outputLog("Start to receive messages");
+
+    // Message receiving loop
     while (true)
     {
-        result = SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(char));
-
-        if (buff == '\0')
+        // If fail to receive a message, terminate the receiving loop
+        if (SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(char)) <= 0)
             break;
-        else
-            str += buff;
-    }
-*/
 
-    return str;
+        // Add command to buffer when a terminating character is received
+        if (buff == '\0')
+        {
+            command = Command(this->parseMessage(str));
+
+            this->cmd_buff_mutex_.lock();
+            this->cmd_buff_.push_back(command);
+            this->cmd_buff_mutex_.unlock();
+
+            str.clear();
+        }
+        else
+        {
+            str += buff;
+        }
+    }
+}
+
+/* Parse a string */
+std::vector<std::string> sdfwMessageReceiver::parseMessage(const std::string& str, const char delimiter)
+{
+    std::vector<std::string> words;
+    std::string word;
+
+    for (int8_t c : str)
+    {
+        if (c == delimiter)
+        {
+            if (!word.empty())
+            {
+                words.push_back(word);
+            }
+            word.clear();
+        }
+        else
+        {
+            word += c;
+        }
+    }
+
+    if (!word.empty())
+    {
+        words.push_back(word);
+    }
+
+    return words;
 }
 
 int32_t sdfwMessageReceiver::openSocket(uint16_t port)

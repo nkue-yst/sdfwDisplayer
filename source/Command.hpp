@@ -11,6 +11,8 @@
 
 struct Command
 {
+    Command() {}
+
     Command(std::vector<std::string> word_list)
     {
         this->function = word_list.front();

@@ -11,6 +11,7 @@
 
 #include <string>
 #include <vector>
+#include <mutex>
 
 /**
 * @brief  Class of receiving message with TCP
@@ -62,9 +63,8 @@ public:
 
     /**
      * @brief  Waiting for message to be received
-     * @return  Received message
      */
-    std::string receiveMessage();
+    void receiveMessage();
 
     /**
      * @brief  Open TCP socket
@@ -84,12 +84,17 @@ private:
      * @param  sock  Socket to close
      */
     void closeSocket();
+
+    /**
+     * @brief  Parse a string
+     * @param  str  Target string
+     * @param  delimiter  Character used to delimit string
+     * @return  Split word list
+     */
+    static std::vector<std::string> parseMessage(const std::string& str, const char delimiter = '/');
     
     /// Instance for singleton
     inline static sdfwMessageReceiver* pInstance_ = nullptr;
-
-    /// Buffer for receiving message
-    std::vector<struct Command> msg_buff_;
 
     /// Server IP address
     IPaddress ip_addr_;
@@ -105,4 +110,11 @@ private:
 
     /// Whether TCP_Open has been executed or not
     bool is_opend_;
+
+public:
+    /// Mutex for command buffer
+    std::mutex cmd_buff_mutex_;
+
+    /// Buffer for receiving message
+    std::vector<struct Command> cmd_buff_;
 };

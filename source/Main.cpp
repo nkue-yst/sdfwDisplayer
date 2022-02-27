@@ -13,7 +13,14 @@
 namespace sdfw
 {
 
-    /* @brief  Quit system with error */
+    /* Initialize singleton instances */
+    void init()
+    {
+        sdfwMessageReceiver::get();
+        sdfwDisplayer::get();
+    }
+
+    /* Quit system with error */
     void abort()
     {
         sdfwMessageReceiver::get()->destroy();
@@ -28,9 +35,11 @@ namespace sdfw
     /* Receiving messages (in a new thread) */
     void threadMessageReceive()
     {
+        outputLog("Start message receiving thread");
+
         sdfwMessageReceiver* msg_recv = sdfwMessageReceiver::get();
 
-        std::cout << msg_recv->openSocket(PORT_NUM) << std::endl;
+        msg_recv->openSocket(PORT_NUM);
         msg_recv->acceptConnection();
 
         msg_recv->receiveMessage();
@@ -41,6 +50,8 @@ namespace sdfw
 
 int main(int argc, char** argv)
 {
+    sdfw::init();
+
     // Thread for receiving messages
     std::thread th_msg_recv(sdfw::threadMessageReceive);
     th_msg_recv.detach();

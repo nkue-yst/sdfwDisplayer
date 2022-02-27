@@ -67,17 +67,9 @@ public:
     /**
      * @brief  Select and execute function
      */
-    void executeCommand(std::string message);
+    void executeCommand();
 
 private:
-    /**
-     * @brief  Parse a string
-     * @param  str  Target string
-     * @param  delimiter  Character used to delimit string
-     * @return  Split word list
-     */
-    std::vector<std::string> parseMessage(const std::string& str, const char delimiter = '/');
-
     /**
      * @brief  Execute opening window
      */

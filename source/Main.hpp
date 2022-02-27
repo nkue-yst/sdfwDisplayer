@@ -9,6 +9,11 @@ namespace sdfw
 {
 
     /**
+     * @brief  Initialize singleton instances
+     */
+    void init();
+
+    /**
      * @brief  Quit system with error
      */
     void abort();

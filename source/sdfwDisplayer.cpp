@@ -47,54 +47,22 @@ void sdfwDisplayer::run()
 {
     while (!this->quit_flag_)
     {
-        sdfw::outputLog("sdfwDisplayer::run()");
+        executeCommand();
     }
 }
 
 /* Select and execute function */
-void sdfwDisplayer::executeCommand(std::string message)
+void sdfwDisplayer::executeCommand()
 {
-    std::vector<std::string> split_message = this->parseMessage(message);
-    Command command(split_message);
-    std::cout << command << std::endl;
+    sdfwMessageReceiver::get()->cmd_buff_mutex_.lock();
 
-    if (command.isEqualFunc("quit"))
+    for (Command cmd : sdfwMessageReceiver::get()->cmd_buff_)
     {
-        int temp;
-        std::cin >> temp;
-        sdfw::abort();
-
-    }
-}
-
-/* Parse a string */
-std::vector<std::string> sdfwDisplayer::parseMessage(const std::string& str, const char delimiter)
-{
-    std::vector<std::string> words;
-    std::string word;
-
-    for (int8_t c : str)
-    {
-        if (c == delimiter)
-        {
-            if (!word.empty())
-            {
-                words.push_back(word);
-            }
-            word.clear();
-        }
-        else
-        {
-            word += c;
-        }
+        std::cout << cmd << std::endl;
+        sdfwMessageReceiver::get()->cmd_buff_.erase(sdfwMessageReceiver::get()->cmd_buff_.begin());
     }
 
-    if (!word.empty())
-    {
-        words.push_back(word);
-    }
-
-    return words;
+    sdfwMessageReceiver::get()->cmd_buff_mutex_.unlock();
 }
 
 /* Execute opening window */
