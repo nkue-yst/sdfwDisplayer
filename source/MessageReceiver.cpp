@@ -34,6 +34,9 @@ void sdfwMessageReceiver::receiveMessage()
 
     sdfw::outputLog("Start to receive messages");
 
+    char ready_msg = '0';
+    SDLNet_TCP_Send(this->accepted_sock_, &ready_msg, sizeof(ready_msg));
+
     // Message receiving loop
     while (true)
     {
@@ -51,6 +54,8 @@ void sdfwMessageReceiver::receiveMessage()
             this->cmd_buff_mutex_.unlock();
 
             str.clear();
+
+            SDLNet_TCP_Send(this->accepted_sock_, &ready_msg, sizeof(ready_msg));
         }
         else
         {
