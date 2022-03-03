@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string>
+
 namespace sdfw
 {
 
@@ -12,6 +14,11 @@ namespace sdfw
      * @brief  Initialize singleton instances
      */
     void init();
+
+    /**
+     * @brief  Quit the application
+     */
+    void quit();
 
     /**
      * @brief  Quit system with error

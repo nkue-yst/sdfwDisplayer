@@ -45,7 +45,7 @@ sdfwDisplayer::~sdfwDisplayer()
 
 void sdfwDisplayer::run()
 {
-    while (!this->quit_flag_)
+    while (!this->getQuitFlag())
     {
         executeCommand();
     }
@@ -56,9 +56,22 @@ void sdfwDisplayer::executeCommand()
 {
     sdfwMessageReceiver::get()->cmd_buff_mutex_.lock();
 
+    // Execute and dequeue commands in receiving buffer
     for (Command cmd : sdfwMessageReceiver::get()->cmd_buff_)
     {
+        // Print for debug
         std::cout << cmd << std::endl;
+
+        // Select called function
+        if (cmd.isEqualFunc("execOpenWindow"))
+        {
+            this->execOpenWindow(stoi(cmd.arguments[0]), stoi(cmd.arguments[1]));
+        }
+        else if (cmd.isEqualFunc("quit"))
+        {
+            sdfw::quit();
+        }
+
         sdfwMessageReceiver::get()->cmd_buff_.erase(sdfwMessageReceiver::get()->cmd_buff_.begin());
     }
 

@@ -69,6 +69,9 @@ public:
      */
     void executeCommand();
 
+    bool getQuitFlag() { return this->quit_flag_; }
+    void setQuitFlag(bool new_flag) { this->quit_flag_ = new_flag; }
+
 private:
     /**
      * @brief  Execute opening window

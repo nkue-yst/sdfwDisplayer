@@ -3,6 +3,7 @@
  * @author  Y.Nakaue
  */
 
+#include "Main.hpp"
 #include "sdfwDisplayer.hpp"
 #include "MessageReceiver.hpp"
 
@@ -20,9 +21,17 @@ namespace sdfw
         sdfwDisplayer::get();
     }
 
+    /* Quit the application */
+    void quit()
+    {
+        sdfwDisplayer::get()->setQuitFlag(true);
+    }
+
     /* Quit system with error */
     void abort()
     {
+        outputLog("Abort");
+
         sdfwMessageReceiver::get()->destroy();
         sdfwDisplayer::get()->destroy();
     }
