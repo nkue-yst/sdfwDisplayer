@@ -63,7 +63,7 @@ void sdfwDisplayer::executeCommand()
         std::cout << cmd << std::endl;
 
         // Select called function
-        if (cmd.isEqualFunc("execOpenWindow"))
+        if (cmd.isEqualFunc("openWindow"))
         {
             this->execOpenWindow(stoi(cmd.arguments[0]), stoi(cmd.arguments[1]));
         }
