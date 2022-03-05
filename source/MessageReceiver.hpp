@@ -57,6 +57,8 @@ public:
      */
     static void destroy()
     {
+        sdfwMessageReceiver::get()->cmd_buff_mutex_.lock();
+
         delete pInstance_;
         pInstance_ = nullptr;
     }

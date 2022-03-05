@@ -52,6 +52,10 @@ namespace sdfw
         msg_recv->acceptConnection();
 
         msg_recv->receiveMessage();
+
+        // Execute destroying singleton classes when quit flag is setted true
+        sdfwMessageReceiver::destroy();
+        sdfwDisplayer::destroy();
     }
 
 }
