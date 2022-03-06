@@ -49,7 +49,7 @@ void MessageReceiver::receiveMessage()
     SDLNet_TCP_Send(this->accepted_sock_, &sync_msg, sizeof(sync_msg));
 
     // Message receiving loop
-    while (true)
+    while (!sdfwDisplayer::get()->getQuitFlag())
     {
         // If fail to receive a message, terminate the receiving loop
         if (SDLNet_TCP_Recv(this->accepted_sock_, &buff, sizeof(char)) <= 0)

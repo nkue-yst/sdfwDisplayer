@@ -81,7 +81,10 @@ namespace components
 /* Quit and release all components */
 void sdfwDisplayer::quit()
 {
+    /* Delay for safe memory release */
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     components::releaseAll(this->components_);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 }
 
 void sdfwDisplayer::run()

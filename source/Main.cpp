@@ -48,9 +48,6 @@ namespace sdfw
         SDFW_DISPLAYER(MessageReceiver)->acceptConnection();
 
         SDFW_DISPLAYER(MessageReceiver)->receiveMessage();
-
-        // Execute destroying singleton classes when quit flag is setted true
-        sdfwDisplayer::get()->quit();
     }
 
 }
@@ -66,5 +63,6 @@ int main(int argc, char** argv)
 
     sdfwDisplayer::get()->run();
 
+    sdfwDisplayer::get()->quit();
     return 0;
 }

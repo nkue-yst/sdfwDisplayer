@@ -94,8 +94,8 @@ private:
 
     /// Displayer components
     std::tuple<
-        sdfwComponent<IWindow>,
-        sdfwComponent<IMessageReceiver>
+        sdfwComponent<IMessageReceiver>,
+        sdfwComponent<IWindow>
     > components_;
 
     /// Quit flag

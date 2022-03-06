@@ -4,6 +4,7 @@
  */
 
 #include "Window.hpp"
+#include <iostream>
 
 IWindow* IWindow::create()
 {
