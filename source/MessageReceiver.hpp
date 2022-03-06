@@ -13,72 +13,86 @@
 #include <vector>
 #include <mutex>
 
-/**
-* @brief  Class of receiving message with TCP
-*/
-class sdfwMessageReceiver
+ /**
+  * @brief Message receiver interface class
+  */
+class IMessageReceiver
 {
-protected:
-    /**
-     * @brief  Initialize variables
-     */
-    sdfwMessageReceiver(uint16_t port = 62491);
-
-    /**
-     * @brief  Close TCP socket if opend
-     */
-    ~sdfwMessageReceiver();
-
 public:
+    virtual ~IMessageReceiver() = default;
+
     /**
      * @brief  Create instance
      */
-    static sdfwMessageReceiver* create()
-    {
-        return new sdfwMessageReceiver();
-    }
+    static IMessageReceiver* create();
 
     /**
-     * @brief  Get instance
-     * @return  Instance of singleton
+     * @brief  Initialize socket
      */
-    static sdfwMessageReceiver* get()
-    {
-        if (pInstance_ == nullptr)
-        {
-            pInstance_ = create();
-        }
-
-        return pInstance_;
-    }
-
-    /**
-     * @brief  Destroy instance
-     */
-    static void destroy()
-    {
-        sdfwMessageReceiver::get()->cmd_buff_mutex_.lock();
-
-        delete pInstance_;
-        pInstance_ = nullptr;
-    }
-
-    /**
-     * @brief  Waiting for message to be received
-     */
-    void receiveMessage();
+    virtual void init() = 0;
 
     /**
      * @brief  Open TCP socket
      * @param  port  Port num using TCP connection
      * @return  Error code (0: Success, 1: Error)
      */
-    int32_t openSocket(uint16_t port = 62491);
+    virtual int32_t openSocket(uint16_t port = 62491) = 0;
 
     /**
      * @brief  Wait for TCP_Accept to complete
      */
-    void acceptConnection();
+    virtual void acceptConnection() = 0;
+
+    /**
+     * @brief  Waiting for message to be received
+     */
+    virtual void receiveMessage() = 0;
+
+    /// Buffer for receiving message
+    std::vector<struct Command> cmd_buff_;
+
+    /// Mutex for command buffer
+    std::mutex cmd_buff_mutex_;
+};
+
+
+/**
+* @brief  Class of receiving message with TCP
+*/
+class MessageReceiver : public IMessageReceiver
+{
+public:
+    /**
+     * @brief  Initialize variables
+     */
+    MessageReceiver(uint16_t port = 62491);
+
+    /**
+     * @brief  Close TCP socket if opend
+     */
+    ~MessageReceiver() override;
+
+    /**
+     * @brief  Initialize socket
+     */
+    void init() override;
+
+    /**
+     * @brief  Waiting for message to be received
+     */
+    void receiveMessage() override;
+
+    /**
+     * @brief  Open TCP socket
+     * @param  port  Port num using TCP connection
+     * @return  Error code (0: Success, 1: Error)
+     */
+    int32_t openSocket(uint16_t port = 62491) override;
+
+    /**
+     * @brief  Wait for TCP_Accept to complete
+     */
+    void acceptConnection() override;
 
 private:
     /**
@@ -96,7 +110,7 @@ private:
     static std::vector<std::string> parseMessage(const std::string& str, const char delimiter = '/');
     
     /// Instance for singleton
-    inline static sdfwMessageReceiver* pInstance_ = nullptr;
+    inline static MessageReceiver* pInstance_ = nullptr;
 
     /// Server IP address
     IPaddress ip_addr_;
@@ -112,11 +126,4 @@ private:
 
     /// Whether TCP_Open has been executed or not
     bool is_opend_;
-
-public:
-    /// Mutex for command buffer
-    std::mutex cmd_buff_mutex_;
-
-    /// Buffer for receiving message
-    std::vector<struct Command> cmd_buff_;
 };

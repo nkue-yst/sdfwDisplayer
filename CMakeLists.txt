@@ -29,14 +29,9 @@ endif()
 
 
 ### Create Target "sdfwDisplayer" ###
+file(GLOB TARGET_SRC source/*.cpp source/*.hpp)
 set(SDFW_DISPLAYER_SRC
-    source/Main.hpp
-    source/Main.cpp
-    source/Command.hpp
-    source/MessageReceiver.hpp
-    source/MessageReceiver.cpp
-    source/sdfwDisplayer.hpp
-    source/sdfwDisplayer.cpp
+    ${TARGET_SRC}
 )
 add_executable(sdfwDisplayer ${SDFW_DISPLAYER_SRC})
 

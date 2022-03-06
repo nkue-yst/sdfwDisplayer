@@ -4,12 +4,19 @@
  */
 
 #pragma once
+
+#include "sdfwComponent.hpp"
+
 #include <SDL.h>
 #include <SDL_thread.h>
 
 #include <memory>
 #include <string>
+#include <tuple>
 #include <vector>
+
+class IMessageReceiver;
+class IWindow;
 
  /**
   * @brief  Main application class
@@ -29,12 +36,14 @@ protected:
 
 public:
     /**
-     * @brief  Create instance
+     * @brief  Initialize all components
      */
-    static sdfwDisplayer* create()
-    {
-        return new sdfwDisplayer();
-    }
+    void init();
+
+    /**
+     * @brief  Quit and release all components
+     */
+    void quit();
 
     /**
      * @brief  Get instance
@@ -42,21 +51,12 @@ public:
      */
     static sdfwDisplayer* get()
     {
-        if (pInstance_ == nullptr)
+        if (sdfwDisplayer::pInstance_ == nullptr)
         {
-            pInstance_ = create();
+            sdfwDisplayer::pInstance_ = new sdfwDisplayer();
         }
 
         return pInstance_;
-    }
-
-    /**
-     * @brief  Destroy instance
-     */
-    static void destroy()
-    {
-        delete pInstance_;
-        pInstance_ = nullptr;
     }
 
     /**
@@ -68,6 +68,17 @@ public:
      * @brief  Select and execute function
      */
     void executeCommand();
+
+    /**
+     * @brief  Get engine component
+     * @return  Specified engine component
+     */
+    template<class T>
+    static auto* getComponent()
+    {
+        return std::get<sdfwComponent<T>>(sdfwDisplayer::pInstance_->components_).get();
+    }
+    #define SDFW_DISPLAYER(COMPONENT) sdfwDisplayer::getComponent<I##COMPONENT>()
 
     bool getQuitFlag() { return this->quit_flag_; }
     void setQuitFlag(bool new_flag) { this->quit_flag_ = new_flag; }
@@ -81,11 +92,11 @@ private:
     /// Instance for singleton
     inline static sdfwDisplayer* pInstance_ = nullptr;
 
-    /// SDL Window
-    SDL_Window* window_;
-
-    /// SDL Renderer
-    SDL_Renderer* renderer_;
+    /// Displayer components
+    std::tuple<
+        sdfwComponent<IWindow>,
+        sdfwComponent<IMessageReceiver>
+    > components_;
 
     /// Quit flag
     bool quit_flag_;

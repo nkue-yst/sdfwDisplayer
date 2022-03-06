@@ -12,7 +12,12 @@
 #include <iostream>
 #include <thread>
 
-sdfwMessageReceiver::sdfwMessageReceiver(uint16_t port)
+IMessageReceiver* IMessageReceiver::create()
+{
+    return new MessageReceiver();
+}
+
+MessageReceiver::MessageReceiver(uint16_t port)
     : port_(port)
     , is_opend_(false)
 {
@@ -21,12 +26,18 @@ sdfwMessageReceiver::sdfwMessageReceiver(uint16_t port)
     this->accepted_sock_ = TCPsocket();
 }
 
-sdfwMessageReceiver::~sdfwMessageReceiver()
+MessageReceiver::~MessageReceiver()
 {
+    this->cmd_buff_mutex_.lock();
     this->closeSocket();
+    this->cmd_buff_mutex_.unlock();
 }
 
-void sdfwMessageReceiver::receiveMessage()
+void MessageReceiver::init()
+{
+}
+
+void MessageReceiver::receiveMessage()
 {
     char buff;
     std::string str;
@@ -65,7 +76,7 @@ void sdfwMessageReceiver::receiveMessage()
 }
 
 /* Parse a string */
-std::vector<std::string> sdfwMessageReceiver::parseMessage(const std::string& str, const char delimiter)
+std::vector<std::string> MessageReceiver::parseMessage(const std::string& str, const char delimiter)
 {
     std::vector<std::string> words;
     std::string word;
@@ -94,7 +105,7 @@ std::vector<std::string> sdfwMessageReceiver::parseMessage(const std::string& st
     return words;
 }
 
-int32_t sdfwMessageReceiver::openSocket(uint16_t port)
+int32_t MessageReceiver::openSocket(uint16_t port)
 {
     /* Create info of server ip */
     if (SDLNet_ResolveHost(&this->ip_addr_, NULL, port) == -1)
@@ -115,7 +126,7 @@ int32_t sdfwMessageReceiver::openSocket(uint16_t port)
     return 0;
 }
 
-void sdfwMessageReceiver::closeSocket()
+void MessageReceiver::closeSocket()
 {
     if (this->is_opend_)
     {
@@ -124,7 +135,7 @@ void sdfwMessageReceiver::closeSocket()
     }
 }
 
-void sdfwMessageReceiver::acceptConnection()
+void MessageReceiver::acceptConnection()
 {
     /* Attempt to connect until TCP_Accept is complete */
     while (true)

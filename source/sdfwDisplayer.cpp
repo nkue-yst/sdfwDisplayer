@@ -7,16 +7,18 @@
 #include "Command.hpp"
 #include "Main.hpp"
 #include "MessageReceiver.hpp"
+#include "Window.hpp"
 
 #include <SDL_net.h>
 
 #include <iostream>
+#include <string>
 
 sdfwDisplayer::sdfwDisplayer()
-    : window_(nullptr)
-    , renderer_(nullptr)
-    , quit_flag_(false)
+    : quit_flag_(false)
 {
+    sdfwDisplayer::pInstance_ = this;
+
     /* Initialize SDL2 */
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -34,13 +36,52 @@ sdfwDisplayer::~sdfwDisplayer()
 {
     sdfw::outputLog("The application terminated successfully.");
 
-    /* Destroy SDL component */
-    SDL_DestroyWindow(this->window_);
-    SDL_DestroyRenderer(this->renderer_);
-
     /* Quit SDL2 and SDL2_net */
     SDLNet_Quit();
     SDL_Quit();
+
+    // Release memory of instance
+    delete sdfwDisplayer::pInstance_;
+    sdfwDisplayer::pInstance_ = nullptr;
+}
+
+/* Initialize all components */
+void sdfwDisplayer::init()
+{
+    SDFW_DISPLAYER(MessageReceiver)->init();
+    SDFW_DISPLAYER(Window)->init();
+}
+
+namespace components
+{
+    /**
+     * @brief  Release an engine component
+     */
+    template<size_t N, class T>
+    static void release(T&& t)
+    {
+        std::get<N>(t).release();
+
+        if constexpr (N > 0)
+        {
+            components::release<N - 1>(t);
+        }
+    }
+
+    /**
+     * @brief  Release all engine components
+     */
+    template <class T>
+    static void releaseAll(T&& t)
+    {
+        return components::release<std::tuple_size_v<std::remove_reference_t<T>> -1>(std::forward<T>(t));
+    }
+}
+
+/* Quit and release all components */
+void sdfwDisplayer::quit()
+{
+    components::releaseAll(this->components_);
 }
 
 void sdfwDisplayer::run()
@@ -54,10 +95,10 @@ void sdfwDisplayer::run()
 /* Select and execute function */
 void sdfwDisplayer::executeCommand()
 {
-    sdfwMessageReceiver::get()->cmd_buff_mutex_.lock();
+    SDFW_DISPLAYER(MessageReceiver)->cmd_buff_mutex_.lock();
 
     // Execute and dequeue commands in receiving buffer
-    for (Command cmd : sdfwMessageReceiver::get()->cmd_buff_)
+    for (Command cmd : SDFW_DISPLAYER(MessageReceiver)->cmd_buff_)
     {
         // Print for debug
         std::cout << cmd << std::endl;
@@ -70,33 +111,37 @@ void sdfwDisplayer::executeCommand()
         else if (cmd.isEqualFunc("quit"))
         {
             sdfw::quit();
+            break;
         }
 
-        sdfwMessageReceiver::get()->cmd_buff_.erase(sdfwMessageReceiver::get()->cmd_buff_.begin());
+        SDFW_DISPLAYER(MessageReceiver)->cmd_buff_.erase(SDFW_DISPLAYER(MessageReceiver)->cmd_buff_.begin());
     }
 
-    sdfwMessageReceiver::get()->cmd_buff_mutex_.unlock();
+    SDFW_DISPLAYER(MessageReceiver)->cmd_buff_mutex_.unlock();
 }
 
 /* Execute opening window */
 void sdfwDisplayer::execOpenWindow(uint32_t width, uint32_t height)
 {
     /* Create new window */
-    this->window_ = SDL_CreateWindow("Window - 1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_BORDERLESS);
-    if (this->window_ == NULL)
+    std::string window_title = "Window - " + std::to_string(SDFW_DISPLAYER(Window)->window_list_.size());
+    SDL_Window* window = SDL_CreateWindow(window_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+    if (window == NULL)
     {
         sdfw::abort();
     }
+    SDFW_DISPLAYER(Window)->window_list_.push_back(window);
 
     /* Create new renderer */
-    this->renderer_ = SDL_CreateRenderer(this->window_, -1, SDL_RENDERER_ACCELERATED);
-    if (this->renderer_ == NULL)
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (renderer == NULL)
     {
         sdfw::abort();
     }
+    SDFW_DISPLAYER(Window)->renderer_list_.push_back(renderer);
 
     /* Clear renderer */
-    SDL_SetRenderDrawColor(this->renderer_, 0, 255, 0, 255);
-    SDL_RenderClear(this->renderer_);
-    SDL_RenderPresent(this->renderer_);
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    SDL_RenderClear(renderer);
+    SDL_RenderPresent(renderer);
 }

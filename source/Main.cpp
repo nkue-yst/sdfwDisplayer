@@ -17,8 +17,7 @@ namespace sdfw
     /* Initialize singleton instances */
     void init()
     {
-        sdfwMessageReceiver::get();
-        sdfwDisplayer::get();
+        sdfwDisplayer::get()->init();
     }
 
     /* Quit the application */
@@ -32,8 +31,7 @@ namespace sdfw
     {
         outputLog("Abort");
 
-        sdfwMessageReceiver::get()->destroy();
-        sdfwDisplayer::get()->destroy();
+        sdfwDisplayer::get()->quit();
     }
 
     void outputLog(std::string message)
@@ -46,16 +44,13 @@ namespace sdfw
     {
         outputLog("Start message receiving thread");
 
-        sdfwMessageReceiver* msg_recv = sdfwMessageReceiver::get();
+        SDFW_DISPLAYER(MessageReceiver)->openSocket(PORT_NUM);
+        SDFW_DISPLAYER(MessageReceiver)->acceptConnection();
 
-        msg_recv->openSocket(PORT_NUM);
-        msg_recv->acceptConnection();
-
-        msg_recv->receiveMessage();
+        SDFW_DISPLAYER(MessageReceiver)->receiveMessage();
 
         // Execute destroying singleton classes when quit flag is setted true
-        sdfwMessageReceiver::destroy();
-        sdfwDisplayer::destroy();
+        sdfwDisplayer::get()->quit();
     }
 
 }
