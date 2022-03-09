@@ -89,6 +89,12 @@ private:
      */
     void execOpenWindow(uint32_t width, uint32_t height);
 
+    /**
+     * @brief  Execute closing window
+     * @param  (win_id)  The ID of window to close
+     */
+    void execCloseWindow(int32_t win_id);
+
     /// Instance for singleton
     inline static sdfwDisplayer* pInstance_ = nullptr;
 

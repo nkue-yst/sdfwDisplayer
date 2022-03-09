@@ -107,14 +107,18 @@ void sdfwDisplayer::executeCommand()
         std::cout << cmd << std::endl;
 
         // Select called function
-        if (cmd.isEqualFunc("openWindow"))
-        {
-            this->execOpenWindow(stoi(cmd.arguments[0]), stoi(cmd.arguments[1]));
-        }
-        else if (cmd.isEqualFunc("quit"))
+        if (cmd.isEqualFunc("quit"))
         {
             sdfw::quit();
             break;
+        }
+        else if (cmd.isEqualFunc("openWindow"))
+        {
+            this->execOpenWindow(stoi(cmd.arguments[0]), stoi(cmd.arguments[1]));
+        }
+        else if (cmd.isEqualFunc("closeWindow"))
+        {
+            this->execCloseWindow(stoi(cmd.arguments[0]));
         }
 
         SDFW_DISPLAYER(MessageReceiver)->cmd_buff_.erase(SDFW_DISPLAYER(MessageReceiver)->cmd_buff_.begin());
@@ -123,7 +127,6 @@ void sdfwDisplayer::executeCommand()
     SDFW_DISPLAYER(MessageReceiver)->cmd_buff_mutex_.unlock();
 }
 
-/* Execute opening window */
 void sdfwDisplayer::execOpenWindow(uint32_t width, uint32_t height)
 {
     /* Create new window */
@@ -147,4 +150,11 @@ void sdfwDisplayer::execOpenWindow(uint32_t width, uint32_t height)
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
+}
+
+void sdfwDisplayer::execCloseWindow(int32_t win_id)
+{
+    /* Destroy window and renderer */
+    SDL_DestroyWindow(SDFW_DISPLAYER(Window)->window_list_.at(win_id));
+    SDL_DestroyRenderer(SDFW_DISPLAYER(Window)->renderer_list_.at(win_id));
 }
