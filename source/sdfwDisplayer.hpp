@@ -16,7 +16,7 @@
 #include <vector>
 
 class IMessageReceiver;
-class IWindow;
+class IWindowManager;
 
  /**
   * @brief  Main application class
@@ -95,13 +95,25 @@ private:
      */
     void execCloseWindow(int32_t win_id);
 
+    /**
+     * @brief  Execute setting background color
+     * @param  (color)  New background color
+     * @param  (win_id)  Target window ID
+     */
+    void execSetBackground(uint8_t red, uint8_t green, uint8_t blue, int32_t win_id);
+
+    /**
+     * @brief  Update all drawings to the latest state
+     */
+    void execUpdate();
+
     /// Instance for singleton
     inline static sdfwDisplayer* pInstance_ = nullptr;
 
     /// Displayer components
     std::tuple<
         sdfwComponent<IMessageReceiver>,
-        sdfwComponent<IWindow>
+        sdfwComponent<IWindowManager>
     > components_;
 
     /// Quit flag

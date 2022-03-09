@@ -6,30 +6,30 @@
 #include "Window.hpp"
 #include <iostream>
 
-IWindow* IWindow::create()
+IWindowManager* IWindowManager::create()
 {
-    return new Window();
+    return new WindowManager();
 }
 
-Window::Window()
+WindowManager::WindowManager()
 {
 }
 
-Window::~Window()
+WindowManager::~WindowManager()
 {
     // Destroy windows
-    for (SDL_Window* win : this->window_list_)
+    for (Window* window : this->window_list_)
     {
-        SDL_DestroyWindow(win);
-    }
+        if (window->window_)
+            SDL_DestroyWindow(window->window_);
 
-    // Destroy renderer
-    for (SDL_Renderer* renderer : this->renderer_list_)
-    {
-        SDL_DestroyRenderer(renderer);
+        if (window->renderer_)
+            SDL_DestroyRenderer(window->renderer_);
+
+        delete window;
     }
 }
 
-void Window::init()
+void WindowManager::init()
 {
 }

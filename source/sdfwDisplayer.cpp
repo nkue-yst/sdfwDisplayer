@@ -49,7 +49,7 @@ sdfwDisplayer::~sdfwDisplayer()
 void sdfwDisplayer::init()
 {
     SDFW_DISPLAYER(MessageReceiver)->init();
-    SDFW_DISPLAYER(Window)->init();
+    SDFW_DISPLAYER(WindowManager)->init();
 }
 
 namespace components
@@ -120,6 +120,14 @@ void sdfwDisplayer::executeCommand()
         {
             this->execCloseWindow(stoi(cmd.arguments[0]));
         }
+        else if (cmd.isEqualFunc("setBackground"))
+        {
+            this->execSetBackground(stoi(cmd.arguments[0]), stoi(cmd.arguments[1]), stoi(cmd.arguments[2]), stoi(cmd.arguments[3]));
+        }
+        else if (cmd.isEqualFunc("update"))
+        {
+            this->execUpdate();
+        }
 
         SDFW_DISPLAYER(MessageReceiver)->cmd_buff_.erase(SDFW_DISPLAYER(MessageReceiver)->cmd_buff_.begin());
     }
@@ -130,31 +138,53 @@ void sdfwDisplayer::executeCommand()
 void sdfwDisplayer::execOpenWindow(uint32_t width, uint32_t height)
 {
     /* Create new window */
-    std::string window_title = "Window - " + std::to_string(SDFW_DISPLAYER(Window)->window_list_.size());
-    SDL_Window* window = SDL_CreateWindow(window_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
-    if (window == NULL)
-    {
-        sdfw::abort();
-    }
-    SDFW_DISPLAYER(Window)->window_list_.push_back(window);
+    Window* win = new Window();
 
-    /* Create new renderer */
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL)
+    std::string window_title = "Window - " + std::to_string(SDFW_DISPLAYER(WindowManager)->window_list_.size());
+    win->window_ = SDL_CreateWindow(window_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+    if (win->window_ == NULL)
     {
         sdfw::abort();
     }
-    SDFW_DISPLAYER(Window)->renderer_list_.push_back(renderer);
+
+    /* Create new renderer for new window */
+    win->renderer_ = SDL_CreateRenderer(win->window_, -1, SDL_RENDERER_ACCELERATED);
+    if (win->renderer_ == NULL)
+    {
+        sdfw::abort();
+    }
+
+    // Add new window to window list
+    SDFW_DISPLAYER(WindowManager)->window_list_.push_back(win);
 
     /* Clear renderer */
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
+    Color bg_color = win->bg_color_;
+    SDL_SetRenderDrawColor(win->renderer_, bg_color.r, bg_color.g, bg_color.b, SDL_ALPHA_OPAQUE);
+    SDL_RenderClear(win->renderer_);
+    SDL_RenderPresent(win->renderer_);
 }
 
 void sdfwDisplayer::execCloseWindow(int32_t win_id)
 {
     /* Destroy window and renderer */
-    SDL_DestroyWindow(SDFW_DISPLAYER(Window)->window_list_.at(win_id));
-    SDL_DestroyRenderer(SDFW_DISPLAYER(Window)->renderer_list_.at(win_id));
+    SDL_DestroyWindow(SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->window_);
+    SDL_DestroyRenderer(SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->renderer_);
+}
+
+void sdfwDisplayer::execSetBackground(uint8_t red, uint8_t green, uint8_t blue, int32_t win_id)
+{
+    /* Set drawing color and clear scene */
+    SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->bg_color_.r = red;
+    SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->bg_color_.g = green;
+    SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->bg_color_.b = blue;
+}
+
+void sdfwDisplayer::execUpdate()
+{
+    for (Window* win : SDFW_DISPLAYER(WindowManager)->window_list_)
+    {
+        SDL_RenderPresent(win->renderer_);
+        SDL_SetRenderDrawColor(win->renderer_, win->bg_color_.r, win->bg_color_.g, win->bg_color_.b, SDL_ALPHA_OPAQUE);
+        SDL_RenderClear(win->renderer_);
+    }
 }

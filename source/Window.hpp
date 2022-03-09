@@ -4,45 +4,66 @@
  */
 
 #pragma once
+#include "Color.hpp"
 
 #include <SDL.h>
 
 #include <vector>
 
  /**
-  * @brief  Window interface class
+  * @brief  Class of window info
   */
-class IWindow
+class Window
 {
 public:
-    virtual ~IWindow() = default;
+    Window()
+        : bg_color_(Color())
+        , window_(nullptr)
+        , renderer_(nullptr)
+    {}
+
+    /// Background color
+    Color bg_color_;
+
+    /// SDL window
+    SDL_Window* window_;
+
+    /// SDL renderer
+    SDL_Renderer* renderer_;
+};
+
+
+ /**
+  * @brief  Window interface class
+  */
+class IWindowManager
+{
+public:
+    virtual ~IWindowManager() = default;
 
     /**
      * @brief  Create instance
      */
-    static IWindow* create();
+    static IWindowManager* create();
 
     /**
      * @brief  Initialize window class
      */
     virtual void init() = 0;
 
-    /// SDL window list
-    std::vector<SDL_Window*> window_list_;
-
-    /// SDL Renderer list
-    std::vector<SDL_Renderer*> renderer_list_;
+    /// Created window list
+    std::vector<Window*> window_list_;
 };
 
 
  /**
   * @brief  Window handller class
   */
-class Window : public IWindow
+class WindowManager : public IWindowManager
 {
 public:
-    Window();
-    ~Window() override;
+    WindowManager();
+    ~WindowManager() override;
 
     /**
      * @brief  Initialize window class
