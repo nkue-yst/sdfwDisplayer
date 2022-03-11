@@ -19,7 +19,7 @@ IMessageReceiver* IMessageReceiver::create()
 
 MessageReceiver::MessageReceiver(uint16_t port)
     : port_(port)
-    , is_opend_(false)
+    , is_opened_(false)
 {
     this->ip_addr_ = IPaddress();
     this->sock_ = TCPsocket();
@@ -42,8 +42,6 @@ void MessageReceiver::receiveMessage()
     char buff;
     std::string str;
     struct Command command;
-
-    sdfw::outputLog("Start to receive messages");
 
     char sync_msg = '0';
     SDLNet_TCP_Send(this->accepted_sock_, &sync_msg, sizeof(sync_msg));
@@ -121,17 +119,17 @@ int32_t MessageReceiver::openSocket(uint16_t port)
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
-    this->is_opend_ = true;
+    this->is_opened_ = true;
 
     return 0;
 }
 
 void MessageReceiver::closeSocket()
 {
-    if (this->is_opend_)
+    if (this->is_opened_)
     {
         SDLNet_TCP_Close(this->sock_);
-        this->is_opend_ = false;
+        this->is_opened_ = false;
     }
 }
 
@@ -146,9 +144,9 @@ void MessageReceiver::acceptConnection()
         if (this->accepted_sock_)
             break;
 
-        sdfw::outputLog("Connection not complete.");
+        sdfw::outputLog("Connection for command not complete.");
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
-    sdfw::outputLog("Connection complete.");
+    sdfw::outputLog("Connection for command complete.");
 }

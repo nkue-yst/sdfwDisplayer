@@ -36,4 +36,9 @@ namespace sdfw
      */
     void threadMessageReceive();
 
+    /**
+     * @brief  Start handling event
+     */
+    void startHandlingEvent();
+
 }

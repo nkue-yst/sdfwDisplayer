@@ -5,6 +5,7 @@
 
 #include "sdfwDisplayer.hpp"
 #include "Command.hpp"
+#include "EventHandler.hpp"
 #include "Main.hpp"
 #include "MessageReceiver.hpp"
 #include "Window.hpp"
@@ -13,6 +14,8 @@
 
 #include <iostream>
 #include <string>
+
+constexpr uint16_t BUFF_SIZE = 512;
 
 sdfwDisplayer::sdfwDisplayer()
     : quit_flag_(false)
@@ -48,6 +51,7 @@ sdfwDisplayer::~sdfwDisplayer()
 /* Initialize all components */
 void sdfwDisplayer::init()
 {
+    SDFW_DISPLAYER(EventHandler)->init();
     SDFW_DISPLAYER(MessageReceiver)->init();
     SDFW_DISPLAYER(WindowManager)->init();
 }
@@ -104,7 +108,7 @@ void sdfwDisplayer::executeCommand()
     for (Command cmd : SDFW_DISPLAYER(MessageReceiver)->cmd_buff_)
     {
         // Print for debug
-        std::cout << cmd << std::endl;
+        // std::cout << cmd << std::endl;
 
         // Select called function
         if (cmd.isEqualFunc("quit"))
@@ -181,6 +185,80 @@ void sdfwDisplayer::execSetBackground(uint8_t red, uint8_t green, uint8_t blue, 
 
 void sdfwDisplayer::execUpdate()
 {
+    /* Update input state */
+    SDL_Event ev;
+    char msg[BUFF_SIZE] = "";
+
+    /* Get and send events by mouse and keyboard */
+    while (SDL_PollEvent(&ev))
+    {
+        switch (ev.type)
+        {
+            /* Mouse button down event */
+            case SDL_MOUSEBUTTONDOWN:
+                strcat_s(msg, "Mouse/Button/Down/");
+                switch (ev.button.button)
+                {
+                    case SDL_BUTTON_LEFT:
+                        strcat_s(msg, "LEFT");
+                        strcat_s(msg, "/");
+                        break;
+
+                    case SDL_BUTTON_MIDDLE:
+                        strcat_s(msg, "MIDDLE");
+                        strcat_s(msg, "/");
+                        break;
+
+                    case SDL_BUTTON_RIGHT:
+                        strcat_s(msg, "RIGHT");
+                        strcat_s(msg, "/");
+                        break;
+
+                    default:
+                        break;
+                }
+                strcat_s(msg, std::to_string(ev.button.x).c_str());
+                strcat_s(msg, "/");
+                strcat_s(msg, std::to_string(ev.button.y).c_str());
+                SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
+                break;
+
+            /* Mouse button up event */
+            case SDL_MOUSEBUTTONUP:
+                strcat_s(msg, "Mouse/Button/Up/");
+                switch (ev.button.button)
+                {
+                    case SDL_BUTTON_LEFT:
+                        strcat_s(msg, "LEFT");
+                        strcat_s(msg, "/");
+                        break;
+
+                    case SDL_BUTTON_MIDDLE:
+                        strcat_s(msg, "MIDDLE");
+                        strcat_s(msg, "/");
+                        break;
+
+                    case SDL_BUTTON_RIGHT:
+                        strcat_s(msg, "RIGHT");
+                        strcat_s(msg, "/");
+                        break;
+
+            
+                    default:
+                        break;
+                }
+                strcat_s(msg, std::to_string(ev.button.x).c_str());
+                strcat_s(msg, "/");
+                strcat_s(msg, std::to_string(ev.button.y).c_str());
+                SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    /* Update drawing */
     for (Window* win : SDFW_DISPLAYER(WindowManager)->window_list_)
     {
         SDL_RenderPresent(win->renderer_);

@@ -125,5 +125,5 @@ private:
     uint16_t port_;
 
     /// Whether TCP_Open has been executed or not
-    bool is_opend_;
+    bool is_opened_;
 };

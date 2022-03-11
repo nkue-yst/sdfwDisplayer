@@ -15,6 +15,7 @@
 #include <tuple>
 #include <vector>
 
+class IEventHandler;
 class IMessageReceiver;
 class IWindowManager;
 
@@ -112,6 +113,7 @@ private:
 
     /// Displayer components
     std::tuple<
+        sdfwComponent<IEventHandler>,
         sdfwComponent<IMessageReceiver>,
         sdfwComponent<IWindowManager>
     > components_;
