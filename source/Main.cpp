@@ -8,6 +8,8 @@
 #include "EventHandler.hpp"
 #include "MessageReceiver.hpp"
 
+#include "SDL_ttf.h"
+
 #include <thread>
 
 #define PORT_NUM 62491
@@ -30,6 +32,7 @@ namespace sdfw
         outputLog("Abort");
 
         sdfwDisplayer::get()->quit();
+        exit(1);
     }
 
     void outputLog(std::string message)

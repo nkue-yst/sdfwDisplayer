@@ -30,16 +30,12 @@ endif()
 
 ### Create Target "sdfwDisplayer" ###
 file(GLOB TARGET_SRC source/*.cpp source/*.hpp)
-set(SDFW_DISPLAYER_SRC
-    ${TARGET_SRC}
-)
+set(SDFW_DISPLAYER_SRC ${TARGET_SRC})
 add_executable(sdfwDisplayer ${SDFW_DISPLAYER_SRC})
 
 
 ### Create Target "SendMessageTest" ###
-set(SEND_MESSAGE_TEST_SRC
-    source/SendMessageTest/Main.cpp
-)
+set(SEND_MESSAGE_TEST_SRC source/SendMessageTest/Main.cpp)
 add_executable(SendMessageTest ${SEND_MESSAGE_TEST_SRC})
 
 
@@ -51,9 +47,11 @@ set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT sdfwDisplayer)
 if(WIN32)
     include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2/include)
     include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/include)
+    include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2_ttf/include)
     find_library(SDL2_LIB SDL2 ${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64)
     find_library(SDL2MAIN_LIB SDL2main ${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64)
     find_library(SDL2_NET_LIB SDL2_net ${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/lib/win64)
+    find_library(SDL2_TTF_LIB SDL2_ttf ${PROJECT_SOURCE_DIR}/thirdparty/SDL2_ttf/lib/win64)
     add_custom_command(
         TARGET sdfwDisplayer POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64/SDL2.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
@@ -61,6 +59,10 @@ if(WIN32)
     add_custom_command(
         TARGET sdfwDisplayer POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/lib/win64/SDL2_net.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
+    )
+    add_custom_command(
+        TARGET sdfwDisplayer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_ttf/lib/win64/SDL2_ttf.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
     )
      add_custom_command(
         TARGET SendMessageTest POST_BUILD
@@ -70,12 +72,18 @@ if(WIN32)
         TARGET SendMessageTest POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/lib/win64/SDL2_net.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
     )
+    add_custom_command(
+        TARGET SendMessageTest POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_ttf/lib/win64/SDL2_ttf.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
+    )
     target_link_libraries(sdfwDisplayer ${SDL2_LIB})
     target_link_libraries(sdfwDisplayer ${SDL2MAIN_LIB})
     target_link_libraries(sdfwDisplayer ${SDL2_NET_LIB})
+    target_link_libraries(sdfwDisplayer ${SDL2_TTF_LIB})
     target_link_libraries(SendMessageTest ${SDL2_LIB})
     target_link_libraries(SendMessageTest ${SDL2MAIN_LIB})
     target_link_libraries(SendMessageTest ${SDL2_NET_LIB})
+    target_link_libraries(SendMessageTest ${SDL2_TTF_LIB})
     target_link_libraries(sdfwDisplayer opengl32)
     target_link_libraries(sdfwDisplayer version)
     target_link_libraries(sdfwDisplayer winmm)
@@ -96,4 +104,8 @@ elseif(APPLE)
 endif()
 
 
-
+### Setup for font data ###
+add_custom_command(
+    TARGET sdfwDisplayer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/Font/NotoSansJP-Regular.otf" $<TARGET_FILE_DIR:sdfwDisplayer>
+)

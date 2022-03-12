@@ -16,6 +16,7 @@
 #include <vector>
 
 class IEventHandler;
+class IFontManager;
 class IMessageReceiver;
 class IWindowManager;
 
@@ -104,6 +105,13 @@ private:
     void execSetBackground(uint8_t red, uint8_t green, uint8_t blue, int32_t win_id);
 
     /**
+     * @brief  Execute print string
+     * @param  (str)  Output string
+     * @param  (win_id)  The ID of window to print string
+     */
+    void execPrint(std::string str, int32_t win_id);
+
+    /**
      * @brief  Update all drawings to the latest state
      */
     void execUpdate();
@@ -113,6 +121,7 @@ private:
 
     /// Displayer components
     std::tuple<
+        sdfwComponent<IFontManager>,
         sdfwComponent<IEventHandler>,
         sdfwComponent<IMessageReceiver>,
         sdfwComponent<IWindowManager>
