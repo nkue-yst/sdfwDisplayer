@@ -10,6 +10,7 @@
 
 #include "SDL_ttf.h"
 
+#include <filesystem>
 #include <thread>
 
 #define PORT_NUM 62491
@@ -42,8 +43,6 @@ namespace sdfw
 
     void threadMessageReceive()
     {
-        outputLog("Start message receiving thread");
-
         SDFW_DISPLAYER(MessageReceiver)->openSocket(PORT_NUM);
         SDFW_DISPLAYER(MessageReceiver)->acceptConnection();
 

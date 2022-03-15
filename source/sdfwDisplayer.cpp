@@ -7,12 +7,12 @@
 #include "Command.hpp"
 #include "EventHandler.hpp"
 #include "FontManager.hpp"
+#include "Logger.hpp"
 #include "Main.hpp"
 #include "MessageReceiver.hpp"
 #include "Window.hpp"
 
 #include <SDL_net.h>
-#include <SDL_ttf.h>
 
 #include <iostream>
 #include <string>
@@ -133,7 +133,7 @@ void sdfwDisplayer::executeCommand()
         }
         else if (cmd.isEqualFunc("print"))
         {
-            this->execPrint(cmd.arguments[0], stoi(cmd.arguments[1]));
+            SDFW_DISPLAYER(Logger)->addToBuffer(cmd.arguments[0], stoi(cmd.arguments[1]));
         }
         else if (cmd.isEqualFunc("update"))
         {
@@ -188,16 +188,6 @@ void sdfwDisplayer::execSetBackground(uint8_t red, uint8_t green, uint8_t blue, 
     SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->bg_color_.r = red;
     SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->bg_color_.g = green;
     SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->bg_color_.b = blue;
-}
-
-void sdfwDisplayer::execPrint(std::string str, int32_t win_id)
-{
-    SDL_Color color = { 255, 255, 255, 255 };
-    SDL_Surface* surface = TTF_RenderText_Blended(SDFW_DISPLAYER(FontManager)->getDefaultFont(), str.c_str(), color);
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->renderer_, surface);
-    SDL_Rect dst = { 0, 0, surface->w, surface->h };
-    SDL_FreeSurface(surface);
-    SDL_RenderCopy(SDFW_DISPLAYER(WindowManager)->window_list_.at(0)->renderer_, texture, NULL, &dst);
 }
 
 void sdfwDisplayer::execUpdate()
@@ -273,6 +263,13 @@ void sdfwDisplayer::execUpdate()
             default:
                 break;
         }
+    }
+
+    /* Draw text and refresh print buffer */
+    SDFW_DISPLAYER(Logger)->execPrint();
+    for (auto& str_list : SDFW_DISPLAYER(Logger)->buff_)
+    {
+        str_list.clear();
     }
 
     /* Update drawing */
