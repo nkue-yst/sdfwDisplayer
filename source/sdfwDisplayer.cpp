@@ -131,6 +131,12 @@ void sdfwDisplayer::executeCommand()
         {
             this->execSetBackground(stoi(cmd.arguments[0]), stoi(cmd.arguments[1]), stoi(cmd.arguments[2]), stoi(cmd.arguments[3]));
         }
+        else if (cmd.isEqualFunc("draw"))
+        {
+            std::string shape_name = cmd.arguments[0];
+            cmd.arguments.erase(cmd.arguments.begin());
+            this->execDrawShape(shape_name, cmd.arguments);
+        }
         else if (cmd.isEqualFunc("print"))
         {
             SDFW_DISPLAYER(Logger)->addToBuffer(cmd.arguments[0], stoi(cmd.arguments[1]));
@@ -188,6 +194,22 @@ void sdfwDisplayer::execSetBackground(uint8_t red, uint8_t green, uint8_t blue, 
     SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->bg_color_.r = red;
     SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->bg_color_.g = green;
     SDFW_DISPLAYER(WindowManager)->window_list_.at(win_id)->bg_color_.b = blue;
+}
+
+void sdfwDisplayer::execDrawShape(std::string name, std::vector<std::string> params)
+{
+    if (name == "Line")
+    {
+        int32_t x0, y0, x1, y1;
+
+        x0 = stoi(params.at(0));
+        y0 = stoi(params.at(1));
+        x1 = stoi(params.at(2));
+        y1 = stoi(params.at(3));
+
+        SDL_SetRenderDrawColor(SDFW_DISPLAYER(WindowManager)->window_list_.at(0)->renderer_, 255, 255, 255, SDL_ALPHA_OPAQUE);
+        SDL_RenderDrawLine(SDFW_DISPLAYER(WindowManager)->window_list_.at(0)->renderer_, x0, y0, x1, y1);
+    }
 }
 
 void sdfwDisplayer::execUpdate()
@@ -265,12 +287,8 @@ void sdfwDisplayer::execUpdate()
         }
     }
 
-    /* Draw text and refresh print buffer */
+    /* Draw text */
     SDFW_DISPLAYER(Logger)->execPrint();
-    for (auto& str_list : SDFW_DISPLAYER(Logger)->buff_)
-    {
-        str_list.clear();
-    }
 
     /* Update drawing */
     for (Window* win : SDFW_DISPLAYER(WindowManager)->window_list_)
@@ -278,5 +296,11 @@ void sdfwDisplayer::execUpdate()
         SDL_RenderPresent(win->renderer_);
         SDL_SetRenderDrawColor(win->renderer_, win->bg_color_.r, win->bg_color_.g, win->bg_color_.b, SDL_ALPHA_OPAQUE);
         SDL_RenderClear(win->renderer_);
+    }
+
+    /* Refresh print buffer */
+    for (auto& str_list : SDFW_DISPLAYER(Logger)->buff_)
+    {
+        str_list.clear();
     }
 }

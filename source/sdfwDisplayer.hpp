@@ -106,6 +106,13 @@ private:
     void execSetBackground(uint8_t red, uint8_t green, uint8_t blue, int32_t win_id);
 
     /**
+     * @brief  Execute drawing shape
+     * @param (name) Drawing shape name
+     * @param (params) Drawing info
+     */
+    void execDrawShape(std::string name, std::vector<std::string> params);
+
+    /**
      * @brief  Update all drawings to the latest state
      */
     void execUpdate();
