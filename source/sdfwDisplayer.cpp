@@ -271,7 +271,6 @@ void sdfwDisplayer::execUpdate()
                         strcat_s(msg, "RIGHT");
                         strcat_s(msg, "/");
                         break;
-
             
                     default:
                         break;
@@ -286,6 +285,20 @@ void sdfwDisplayer::execUpdate()
                 break;
         }
     }
+
+    /* Send mouse cursor coordinate */
+    // Initialize message buffer
+    memset(msg, '\0', sizeof(msg));
+
+    int32_t x, y;  // Mouse cursor coord
+
+    SDL_GetMouseState(&x, &y);
+    strcat_s(msg, "Mouse/X/");
+    strcat_s(msg, std::to_string(x).c_str());
+    strcat_s(msg, "/Y/");
+    strcat_s(msg, std::to_string(y).c_str());
+
+    SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
 
     /* Draw text */
     SDFW_DISPLAYER(Logger)->execPrint();
