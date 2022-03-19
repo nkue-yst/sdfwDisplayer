@@ -13,6 +13,7 @@
 #include "Window.hpp"
 
 #include <SDL_net.h>
+#include <SDL2_gfxPrimitives.h>
 
 #include <iostream>
 #include <string>
@@ -200,15 +201,17 @@ void sdfwDisplayer::execDrawShape(std::string name, std::vector<std::string> par
 {
     if (name == "Line")
     {
-        int32_t x0, y0, x1, y1;
+        int16_t x0, y0, x1, y1;
+        int32_t thickness, win;
 
-        x0 = stoi(params.at(0));
-        y0 = stoi(params.at(1));
-        x1 = stoi(params.at(2));
-        y1 = stoi(params.at(3));
+        x0 = static_cast<int16_t>(stoi(params.at(0)));
+        y0 = static_cast<int16_t>(stoi(params.at(1)));
+        x1 = static_cast<int16_t>(stoi(params.at(2)));
+        y1 = static_cast<int16_t>(stoi(params.at(3)));
+        thickness = stoi(params.at(4));
+        win = stoi(params.at(5));
 
-        SDL_SetRenderDrawColor(SDFW_DISPLAYER(WindowManager)->window_list_.at(0)->renderer_, 255, 255, 255, SDL_ALPHA_OPAQUE);
-        SDL_RenderDrawLine(SDFW_DISPLAYER(WindowManager)->window_list_.at(0)->renderer_, x0, y0, x1, y1);
+         thickLineRGBA(SDFW_DISPLAYER(WindowManager)->window_list_.at(win)->renderer_, x0, y0, x1, y1, thickness, 255, 255, 255, 255);
     }
 }
 
