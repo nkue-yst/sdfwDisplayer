@@ -117,7 +117,7 @@ void sdfwDisplayer::executeCommand()
         // Select called function
         if (cmd.isEqualFunc("quit"))
         {
-            sdfw::quit();
+            this->setQuitFlag(true);
             break;
         }
         else if (cmd.isEqualFunc("openWindow"))
@@ -274,7 +274,7 @@ void sdfwDisplayer::execUpdate()
                         strcat_s(msg, "RIGHT");
                         strcat_s(msg, "/");
                         break;
-            
+
                     default:
                         break;
                 }
@@ -283,6 +283,12 @@ void sdfwDisplayer::execUpdate()
                 strcat_s(msg, std::to_string(ev.button.y).c_str());
                 SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
                 break;
+
+            /* Quit event */
+            case SDL_QUIT:
+                strcat_s(msg, "QUIT");
+                SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
+                return;
 
             default:
                 break;
