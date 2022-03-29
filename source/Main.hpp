@@ -23,7 +23,7 @@ namespace sdfw
     /**
      * @brief  Quit system with error
      */
-    void abort();
+    void abort(std::string message = "");
 
     /**
      * @brief  Output log message

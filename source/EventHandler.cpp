@@ -4,6 +4,7 @@
  */
 
 #include "EventHandler.hpp"
+#include "sdfwDisplayer.hpp"
 #include "Main.hpp"
 
 IEventHandler* IEventHandler::create()
@@ -71,12 +72,7 @@ void EventHandler::acceptConnection()
 void EventHandler::sendMessage(const char* msg)
 {
     SDLNet_TCP_Recv(this->accepted_sock_, &this->sync_msg_, sizeof(char));
-
-    int32_t result = SDLNet_TCP_Send(this->accepted_sock_, msg, static_cast<int32_t>(strlen(msg) + 1));
-    if (result < (strlen(msg) + 1))
-    {
-        sdfw::abort();
-    }
+    SDLNet_TCP_Send(this->accepted_sock_, msg, static_cast<int32_t>(strlen(msg) + 1));
 }
 
 void EventHandler::closeSocket()

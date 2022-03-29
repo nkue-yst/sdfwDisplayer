@@ -209,9 +209,21 @@ void sdfwDisplayer::execDrawShape(std::string name, std::vector<std::string> par
         x1 = static_cast<int16_t>(stoi(params.at(2)));
         y1 = static_cast<int16_t>(stoi(params.at(3)));
         thickness = stoi(params.at(4));
-        win = stoi(params.at(8));
+        win = stoi(params.at(9));
 
-         thickLineRGBA(SDFW_DISPLAYER(WindowManager)->window_list_.at(win)->renderer_, x0, y0, x1, y1, thickness, stoi(params.at(5)), stoi(params.at(6)), stoi(params.at(7)), 255);
+         thickLineRGBA(SDFW_DISPLAYER(WindowManager)->window_list_.at(win)->renderer_, x0, y0, x1, y1, thickness, stoi(params.at(5)), stoi(params.at(6)), stoi(params.at(7)), stoi(params.at(8)));
+    }
+    else if (name == "Circle")
+    {
+        int16_t x, y, rad;
+        int32_t win;
+
+        x = static_cast<int16_t>(stoi(params.at(0)));
+        y = static_cast<int16_t>(stoi(params.at(1)));
+        rad = static_cast<int16_t>(stoi(params.at(2)));
+        win = stoi(params.at(7));
+
+        filledCircleRGBA(SDFW_DISPLAYER(WindowManager)->window_list_.at(win)->renderer_, x, y, rad, stoi(params.at(3)), stoi(params.at(4)), stoi(params.at(5)), stoi(params.at(6)));
     }
 }
 
@@ -284,16 +296,19 @@ void sdfwDisplayer::execUpdate()
                 SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
                 break;
 
-            /* Quit event */
-            case SDL_QUIT:
-                strcat_s(msg, "QUIT");
-                SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
-                return;
-
             default:
                 break;
         }
+
+        /* User quit request */
+        if (ev.window.event == SDL_WINDOWEVENT_CLOSE)
+        {
+            strcat_s(msg, "QUIT");
+            SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
+            return;
+        }
     }
+
 
     /* Send mouse cursor coordinate */
     // Initialize message buffer

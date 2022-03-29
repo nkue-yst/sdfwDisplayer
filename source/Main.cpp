@@ -28,9 +28,9 @@ namespace sdfw
         sdfwDisplayer::get()->setQuitFlag(true);
     }
 
-    void abort()
+    void abort(std::string message)
     {
-        outputLog("Abort");
+        outputLog("Abort -> " + message);
 
         sdfwDisplayer::get()->quit();
         exit(1);
