@@ -4,6 +4,8 @@
  */
 
 #include "sdfwDisplayer.hpp"
+#include "Audio.hpp"
+#include "AssetHandler.hpp"
 #include "Command.hpp"
 #include "EventHandler.hpp"
 #include "FontManager.hpp"
@@ -14,6 +16,7 @@
 
 #include <SDL_net.h>
 #include <SDL2_gfxPrimitives.h>
+#include <SDL_mixer.h>
 
 #include <iostream>
 #include <string>
@@ -36,6 +39,10 @@ sdfwDisplayer::sdfwDisplayer()
     {
         abort();
     }
+
+    /* Initialize SDL2_mixer */
+    Mix_Init(MIX_INIT_MP3);
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
 }
 
 sdfwDisplayer::~sdfwDisplayer()
@@ -43,6 +50,8 @@ sdfwDisplayer::~sdfwDisplayer()
     sdfw::outputLog("The application terminated successfully.");
 
     /* Quit SDL2 and SDL2_net */
+    Mix_CloseAudio();
+    Mix_Quit();
     SDLNet_Quit();
     SDL_Quit();
 
@@ -103,7 +112,6 @@ void sdfwDisplayer::run()
     }
 }
 
-/* Select and execute function */
 void sdfwDisplayer::executeCommand()
 {
     SDFW_DISPLAYER(MessageReceiver)->cmd_buff_mutex_.lock();
@@ -137,6 +145,17 @@ void sdfwDisplayer::executeCommand()
             std::string shape_name = cmd.arguments[0];
             cmd.arguments.erase(cmd.arguments.begin());
             this->execDrawShape(shape_name, cmd.arguments);
+        }
+        else if (cmd.isEqualFunc("load"))
+        {
+            this->execLoadAsset(cmd.arguments[0], cmd.arguments[1]);
+        }
+        else if (cmd.isEqualFunc("play"))
+        {
+            if (cmd.arguments[0] == "Audio")
+            {
+                this->execPlayAudio(cmd.arguments[1]);
+            }
         }
         else if (cmd.isEqualFunc("print"))
         {
@@ -225,6 +244,19 @@ void sdfwDisplayer::execDrawShape(std::string name, std::vector<std::string> par
 
         filledCircleRGBA(SDFW_DISPLAYER(WindowManager)->window_list_.at(win)->renderer_, x, y, rad, stoi(params.at(3)), stoi(params.at(4)), stoi(params.at(5)), stoi(params.at(6)));
     }
+}
+
+void sdfwDisplayer::execLoadAsset(std::string type, std::string path)
+{
+    if (type == "Audio")
+    {
+        SDFW_DISPLAYER(AssetHandler)->getAudioAsset(path);
+    }
+}
+
+void sdfwDisplayer::execPlayAudio(std::string path)
+{
+    SDFW_DISPLAYER(AssetHandler)->getAudioAsset(path)->play();
 }
 
 void sdfwDisplayer::execUpdate()

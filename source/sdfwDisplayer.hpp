@@ -15,6 +15,7 @@
 #include <tuple>
 #include <vector>
 
+class IAssetHandler;
 class IEventHandler;
 class IFontManager;
 class ILogger;
@@ -112,6 +113,9 @@ private:
      */
     void execDrawShape(std::string name, std::vector<std::string> params);
 
+    void execLoadAsset(std::string type, std::string path);
+    void execPlayAudio(std::string path);
+
     /**
      * @brief  Update all drawings to the latest state
      */
@@ -122,6 +126,7 @@ private:
 
     /// Displayer components
     std::tuple<
+        sdfwComponent<IAssetHandler>,
         sdfwComponent<IFontManager>,
         sdfwComponent<IEventHandler>,
         sdfwComponent<ILogger>,

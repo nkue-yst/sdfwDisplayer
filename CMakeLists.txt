@@ -42,11 +42,13 @@ if(WIN32)
     include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/include)
     include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2_ttf/include)
     include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2_gfx/include)
+    include_directories(${PROJECT_SOURCE_DIR}/thirdparty/SDL2_mixer/include)
     find_library(SDL2_LIB SDL2 ${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64)
     find_library(SDL2MAIN_LIB SDL2main ${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64)
     find_library(SDL2_NET_LIB SDL2_net ${PROJECT_SOURCE_DIR}/thirdparty/SDL2_net/lib/win64)
     find_library(SDL2_TTF_LIB SDL2_ttf ${PROJECT_SOURCE_DIR}/thirdparty/SDL2_ttf/lib/win64)
     find_library(SDL2_GFX_LIB SDL2_gfx ${PROJECT_SOURCE_DIR}/thirdparty/SDL2_gfx/lib/win64)
+    find_library(SDL2_MIX_LIB SDL2_mixer ${PROJECT_SOURCE_DIR}/thirdparty/SDL2_mixer/lib/win64)
     add_custom_command(
         TARGET sdfwDisplayer POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2/lib/win64/SDL2.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
@@ -63,11 +65,44 @@ if(WIN32)
         TARGET sdfwDisplayer POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_gfx/lib/win64/SDL2_gfx.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
     )
+    add_custom_command(
+        TARGET sdfwDisplayer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_mixer/lib/win64/SDL2_mixer.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
+    )
+    add_custom_command(
+        TARGET sdfwDisplayer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_mixer/lib/win64/libmodplug-1.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
+    )
+    add_custom_command(
+        TARGET sdfwDisplayer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_mixer/lib/win64/libmpg123-0.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
+    )
+    add_custom_command(
+        TARGET sdfwDisplayer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_mixer/lib/win64/libogg-0.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
+    )
+    add_custom_command(
+        TARGET sdfwDisplayer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_mixer/lib/win64/libopus-0.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
+    )
+    add_custom_command(
+        TARGET sdfwDisplayer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_mixer/lib/win64/libopusfile-0.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
+    )
+    add_custom_command(
+        TARGET sdfwDisplayer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_mixer/lib/win64/libvorbis-0.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
+    )
+    add_custom_command(
+        TARGET sdfwDisplayer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy "${PROJECT_SOURCE_DIR}/thirdparty/SDL2_mixer/lib/win64/libvorbisfile-3.dll" $<TARGET_FILE_DIR:sdfwDisplayer>
+    )
     target_link_libraries(sdfwDisplayer ${SDL2_LIB})
     target_link_libraries(sdfwDisplayer ${SDL2MAIN_LIB})
     target_link_libraries(sdfwDisplayer ${SDL2_NET_LIB})
     target_link_libraries(sdfwDisplayer ${SDL2_TTF_LIB})
     target_link_libraries(sdfwDisplayer ${SDL2_GFX_LIB})
+    target_link_libraries(sdfwDisplayer ${SDL2_MIX_LIB})
     target_link_libraries(sdfwDisplayer opengl32)
     target_link_libraries(sdfwDisplayer version)
     target_link_libraries(sdfwDisplayer winmm)

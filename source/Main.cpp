@@ -5,6 +5,8 @@
 
 #include "Main.hpp"
 #include "sdfwDisplayer.hpp"
+
+#include "AssetHandler.hpp"
 #include "EventHandler.hpp"
 #include "MessageReceiver.hpp"
 
