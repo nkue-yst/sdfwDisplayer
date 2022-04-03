@@ -7,6 +7,8 @@
 #include "sdfwDisplayer.hpp"
 #include "Main.hpp"
 
+#include <thread>
+
 IEventHandler* IEventHandler::create()
 {
     return new EventHandler();

@@ -6,7 +6,7 @@ project(sdfwDisplayer CXX)
 
 ### Setup C++ ###
 enable_language(CXX)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -108,7 +108,10 @@ if(WIN32)
     target_link_libraries(sdfwDisplayer winmm)
     target_link_libraries(sdfwDisplayer imm32)
     target_link_libraries(sdfwDisplayer setupapi)
-elseif(APPLE)
+elseif(UNIX)
+    find_package(Threads REQUIRED)
+    target_link_libraries(sdfwDisplayer Threads::Threads)
+
     list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/thirdparty/sdl2-cmake-modules)
 
     find_package(SDL2 REQUIRED)
@@ -118,6 +121,18 @@ elseif(APPLE)
     find_package(SDL2_net REQUIRED)
     include_directories(${SDL2_net_INCLUDE_DIR})
     target_link_libraries(sdfwDisplayer SDL2::Net)
+
+    find_package(SDL2_mixer REQUIRED)
+    include_directories(${SDL2_mixer_INCLUDE_DIR})
+    target_link_libraries(sdfwDisplayer SDL2::Mixer)
+
+    find_package(SDL2_ttf REQUIRED)
+    include_directories(${SDL2_ttf_INCLUDE_DIR})
+    target_link_libraries(sdfwDisplayer SDL2::TTF)
+
+    find_package(SDL2_gfx REQUIRED)
+    include_directories(${SDL2_gfx_INCLUDE_DIR})
+    target_link_libraries(sdfwDisplayer SDL2::GFX)
 endif()
 
 

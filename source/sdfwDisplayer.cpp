@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <string>
+#include <thread>
 
 constexpr uint16_t BUFF_SIZE = 512;
 
@@ -272,59 +273,59 @@ void sdfwDisplayer::execUpdate()
         {
             /* Mouse button down event */
             case SDL_MOUSEBUTTONDOWN:
-                strcat_s(msg, "Mouse/Button/Down/");
+                strcat(msg, "Mouse/Button/Down/");
                 switch (ev.button.button)
                 {
                     case SDL_BUTTON_LEFT:
-                        strcat_s(msg, "LEFT");
-                        strcat_s(msg, "/");
+                        strcat(msg, "LEFT");
+                        strcat(msg, "/");
                         break;
 
                     case SDL_BUTTON_MIDDLE:
-                        strcat_s(msg, "MIDDLE");
-                        strcat_s(msg, "/");
+                        strcat(msg, "MIDDLE");
+                        strcat(msg, "/");
                         break;
 
                     case SDL_BUTTON_RIGHT:
-                        strcat_s(msg, "RIGHT");
-                        strcat_s(msg, "/");
+                        strcat(msg, "RIGHT");
+                        strcat(msg, "/");
                         break;
 
                     default:
                         break;
                 }
-                strcat_s(msg, std::to_string(ev.button.x).c_str());
-                strcat_s(msg, "/");
-                strcat_s(msg, std::to_string(ev.button.y).c_str());
+                strcat(msg, std::to_string(ev.button.x).c_str());
+                strcat(msg, "/");
+                strcat(msg, std::to_string(ev.button.y).c_str());
                 SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
                 break;
 
             /* Mouse button up event */
             case SDL_MOUSEBUTTONUP:
-                strcat_s(msg, "Mouse/Button/Up/");
+                strcat(msg, "Mouse/Button/Up/");
                 switch (ev.button.button)
                 {
                     case SDL_BUTTON_LEFT:
-                        strcat_s(msg, "LEFT");
-                        strcat_s(msg, "/");
+                        strcat(msg, "LEFT");
+                        strcat(msg, "/");
                         break;
 
                     case SDL_BUTTON_MIDDLE:
-                        strcat_s(msg, "MIDDLE");
-                        strcat_s(msg, "/");
+                        strcat(msg, "MIDDLE");
+                        strcat(msg, "/");
                         break;
 
                     case SDL_BUTTON_RIGHT:
-                        strcat_s(msg, "RIGHT");
-                        strcat_s(msg, "/");
+                        strcat(msg, "RIGHT");
+                        strcat(msg, "/");
                         break;
 
                     default:
                         break;
                 }
-                strcat_s(msg, std::to_string(ev.button.x).c_str());
-                strcat_s(msg, "/");
-                strcat_s(msg, std::to_string(ev.button.y).c_str());
+                strcat(msg, std::to_string(ev.button.x).c_str());
+                strcat(msg, "/");
+                strcat(msg, std::to_string(ev.button.y).c_str());
                 SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
                 break;
 
@@ -335,7 +336,7 @@ void sdfwDisplayer::execUpdate()
         /* User quit request */
         if (ev.window.event == SDL_WINDOWEVENT_CLOSE)
         {
-            strcat_s(msg, "QUIT");
+            strcat(msg, "QUIT");
             SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
             return;
         }
@@ -349,10 +350,10 @@ void sdfwDisplayer::execUpdate()
     int32_t x, y;  // Mouse cursor coord
 
     SDL_GetMouseState(&x, &y);
-    strcat_s(msg, "Mouse/X/");
-    strcat_s(msg, std::to_string(x).c_str());
-    strcat_s(msg, "/Y/");
-    strcat_s(msg, std::to_string(y).c_str());
+    strcat(msg, "Mouse/X/");
+    strcat(msg, std::to_string(x).c_str());
+    strcat(msg, "/Y/");
+    strcat(msg, std::to_string(y).c_str());
 
     SDFW_DISPLAYER(EventHandler)->sendMessage(msg);
 
